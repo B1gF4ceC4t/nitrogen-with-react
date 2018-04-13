@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import mirror, { actions, connect } from "mirrorx";
+import { Button } from "antd";
 import { getUrlKey } from "../../utils/string-utils";
 import { HOST_CONCIG, KEY_CONFIG } from "../../../main/services/config";
 import AuthModel from "../../models/Auth";
-import { ipcRenderer } from "electron";
+import { ipcRenderer, remote } from "electron";
 import { logger } from "../../utils/logger";
 import "./index.less";
 
 mirror.model(AuthModel);
+const win = remote.getGlobal("win");
 const ipc = ipcRenderer;
 
 ipc.on("weibo::accessToken::success", (event, msg) => {
@@ -28,6 +30,16 @@ class Login extends Component {
   constructor(props) {
     super(props);
   }
+  go2Home = () => {
+    actions.routing.push("/home");
+  };
+  go2Auth = () => {
+    win.loadURL(
+      `${HOST_CONCIG.oauth}?client_id=${KEY_CONFIG.app_key}&redirect_uri=${
+        KEY_CONFIG.redirect_uri
+      }`
+    );
+  };
   componentDidMount = () => {
     let oauthCode = getUrlKey("code");
     if (oauthCode) {
@@ -37,14 +49,15 @@ class Login extends Component {
   render() {
     return (
       <div className="login">
-        <a
-          href={`${HOST_CONCIG.oauth}?client_id=${
-            KEY_CONFIG.app_key
-          }&redirect_uri=${KEY_CONFIG.redirect_uri}`}
-          className="loginBtn"
-        >
-          登录
-        </a>
+        {this.props.login ? (
+          <Button className="button enter" onClick={this.go2Home}>
+            进入Nitrogen
+          </Button>
+        ) : (
+          <Button className="button login" onClick={this.go2Auth}>
+            登录
+          </Button>
+        )}
       </div>
     );
   }

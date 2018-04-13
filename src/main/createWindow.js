@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 const createWindow = () => {
     // Create the browser window.
-    let mainWindow = new BrowserWindow({
+    let win = new BrowserWindow({
         width: 930,
         minWidth: 930,
         maxWidth: 930,
@@ -17,13 +17,13 @@ const createWindow = () => {
         skipTaskbar: false
     });
     if (__isDev__) {
-        mainWindow.loadURL('http://localhost:8080/index.html');
+        win.loadURL('http://localhost:8080/index.html');
         BrowserWindow.addDevToolsExtension('/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.2.1_0');
         BrowserWindow.addDevToolsExtension('/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.15.2_0');
         // Open the DevTools.
-        mainWindow.webContents.openDevTools();
+        win.webContents.openDevTools();
     } else {
-        mainWindow.loadURL(format({
+        win.loadURL(format({
             pathname: resolve(process.resourcesPath, 'app/renderer/index.html'),
             protocol: 'file:',
             slashes: true,
@@ -31,11 +31,11 @@ const createWindow = () => {
     }
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', () => {
-      mainWindow = null;
+    win.on('closed', () => {
+      win = null;
     });
-    global.mainWindow = mainWindow;
-    return mainWindow;
+    global.win = win;
+    return win;
 }
 
 export default createWindow;

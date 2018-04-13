@@ -11519,7 +11519,7 @@ module.exports = __webpack_require__("util").deprecate;
 
 const createWindow = () => {
     // Create the browser window.
-    let mainWindow = new __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"]({
+    let win = new __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"]({
         width: 930,
         minWidth: 930,
         maxWidth: 930,
@@ -11532,13 +11532,13 @@ const createWindow = () => {
         skipTaskbar: false
     });
     if (true) {
-        mainWindow.loadURL('http://localhost:8080/index.html');
+        win.loadURL('http://localhost:8080/index.html');
         __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"].addDevToolsExtension('/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.2.1_0');
         __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"].addDevToolsExtension('/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.15.2_0');
         // Open the DevTools.
-        mainWindow.webContents.openDevTools();
+        win.webContents.openDevTools();
     } else {
-        mainWindow.loadURL(format({
+        win.loadURL(format({
             pathname: resolve(process.resourcesPath, 'app/renderer/index.html'),
             protocol: 'file:',
             slashes: true
@@ -11546,11 +11546,11 @@ const createWindow = () => {
     }
 
     // Emitted when the window is closed.
-    mainWindow.on('closed', () => {
-        mainWindow = null;
+    win.on('closed', () => {
+        win = null;
     });
-    global.mainWindow = mainWindow;
-    return mainWindow;
+    global.win = win;
+    return win;
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (createWindow);
@@ -11574,20 +11574,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-let mainWindow;
+let win;
 
 /**
  * @description 初始化窗口等相关
  */
 const onReady = () => {
-  mainWindow = Object(__WEBPACK_IMPORTED_MODULE_1__createWindow__["a" /* default */])();
+  win = Object(__WEBPACK_IMPORTED_MODULE_1__createWindow__["a" /* default */])();
   if (false) {
     const menu = Menu.buildFromTemplate(configureMenu({ app }));
     Menu.setApplicationMenu(menu);
   }
   // 启动调试工具
   __WEBPACK_IMPORTED_MODULE_0_electron__["globalShortcut"].register('CmdOrCtrl+Shift+8', () => {
-    mainWindow.webContents.toggleDevTools();
+    win.webContents.toggleDevTools();
   });
   Object(__WEBPACK_IMPORTED_MODULE_3__ipc__["a" /* default */])();
 };
@@ -11604,10 +11604,10 @@ __WEBPACK_IMPORTED_MODULE_0_electron__["app"].on('window-all-closed', () => {
 
 //当激活electron窗体的时候，仅支持MacOS
 __WEBPACK_IMPORTED_MODULE_0_electron__["app"].on('activate', () => {
-  if (mainWindow === null) {
+  if (win === null) {
     Object(__WEBPACK_IMPORTED_MODULE_1__createWindow__["a" /* default */])();
   }
-  mainWindow.show();
+  win.show();
 });
 
 //全局挂载供渲染进程使用

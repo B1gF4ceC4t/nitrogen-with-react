@@ -10,7 +10,7 @@ export default {
   initialState: {
     oauthCode: null,
     token: {},
-    login: false
+    login: getToken()?true:false
   },
   reducers: {
     save (state, data) {

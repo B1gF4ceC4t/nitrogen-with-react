@@ -1,20 +1,38 @@
 .login{
   height: 100%;
   position: relative;
-  .loginBtn{
+  background-color: #FCFCFC;
+  .button{
     text-decoration: none;
-    background-color: #000;
-    color: #fff;
     display: inline-block;
     text-align: center;
     width: 150px;
-    height: 40px;
-    line-height: 40px;
+    height: 45px;
+    line-height: 45px;
     border-radius: 30px;
     font-size: 18px;
     position: absolute;
     bottom: 10%;
     left: 50%;
     margin-left: -75px;
+  }
+  .login{
+    background-color: transparent;
+    color: #F38181;
+    border: 2px solid #F38181;
+    &:hover,&:active{
+      color: #FFF;
+      background-color: #D15959;
+      border-color: #D15959;
+    }
+  }
+  .enter{
+    background-color: #C1F7F1;
+    color: #fff;
+    border: none;
+    &:hover,&:active{
+      background-color: #A9EEE6;
+      border: none;
+    }
   }
 }

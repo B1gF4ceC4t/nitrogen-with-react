@@ -4,20 +4,20 @@ import configureMenu from './menu';
 import ipc from './ipc';
 import tasks from './tasks';
 
-let mainWindow;
+let win;
 
 /**
  * @description 初始化窗口等相关
  */
 const onReady = () => {
-  mainWindow = createWindow();
+  win = createWindow();
   if (!__isDev__) {
     const menu = Menu.buildFromTemplate(configureMenu({ app }));
     Menu.setApplicationMenu(menu);
   }
   // 启动调试工具
   globalShortcut.register('CmdOrCtrl+Shift+8', () => {
-    mainWindow.webContents.toggleDevTools();
+    win.webContents.toggleDevTools();
   });
   ipc();
 }
@@ -34,10 +34,10 @@ app.on('window-all-closed', () => {
 
 //当激活electron窗体的时候，仅支持MacOS
 app.on('activate', () => {
-  if (mainWindow === null) {
+  if (win === null) {
     createWindow();
   }
-  mainWindow.show();
+  win.show();
 });
 
 //全局挂载供渲染进程使用
