@@ -1,0 +1,20 @@
+{
+  "name": "Nitrogen",
+  "productName": "Nitrogen",
+  "version": "0.0.0",
+  "description": "A cross platform weibo desktop app with React by Electron",
+  "main": "./main.js",
+  "keywords": [],
+  "author": {
+    "name": "B1gF4ceC4t",
+    "email": "744954205@qq.com"
+  },
+  "scripts": {
+    "postinstall": "npm rebuild --runtime=electron --target=1.8.4 --disturl=https://atom.io/download/atom-shell --build-from-source"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "npm": "^5.8.0",
+    "uba": "^2.3.9"
+  }
+}
