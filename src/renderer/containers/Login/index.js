@@ -2,24 +2,25 @@ import React, { Component } from "react";
 import mirror, { actions, connect } from "mirrorx";
 import { getUrlKey } from "../../utils/string-utils";
 import { HOST_CONCIG, KEY_CONFIG } from "../../../main/services/config";
-import LoginModel from "../../models/Login";
+import AuthModel from "../../models/Auth";
 import { ipcRenderer } from "electron";
+import { logger } from "../../utils/logger";
 import "./index.less";
 
-mirror.model(LoginModel);
+mirror.model(AuthModel);
 const ipc = ipcRenderer;
 
 ipc.on("weibo::accessToken::success", (event, msg) => {
   if (msg) {
-    console.log("weibo::accessToken::success");
-    console.log(msg);
+    logger("weibo::accessToken::success", msg);
+    actions.auth.saveToken(msg);
+    actions.routing.push("/home");
   }
 });
 
 ipc.on("weibo::accessToken::fail", (event, msg) => {
   if (msg) {
-    console.log("weibo::accessToken::fail");
-    console.log(msg);
+    logger("weibo::accessToken::fail", msg);
   }
 });
 
@@ -30,7 +31,7 @@ class Login extends Component {
   componentDidMount = () => {
     let oauthCode = getUrlKey("code");
     if (oauthCode) {
-      actions.login.accessToken(oauthCode);
+      actions.auth.accessToken(oauthCode);
     }
   };
   render() {
@@ -49,4 +50,4 @@ class Login extends Component {
   }
 }
 
-export default connect(state => state.login)(Login);
+export default connect(state => state.auth)(Login);

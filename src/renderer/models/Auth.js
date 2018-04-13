@@ -6,7 +6,7 @@ import { ipcRenderer } from "electron";
 const ipc = ipcRenderer;
 
 export default {
-  name: "login",
+  name: "auth",
   initialState: {
     oauthCode: null,
     token: {},
@@ -35,6 +35,16 @@ export default {
         options: {
           form: true
         }
+      });
+      actions.auth.save({
+        oauthCode: data
+      })
+    },
+    saveToken (data, getState) {
+      saveToken(data);
+      actions.auth.save({
+        token: data,
+        login: true
       });
     }
   }

@@ -813,6 +813,200 @@ module.exports.DuplexWrapper = DuplexWrapper;
 
 /***/ }),
 
+/***/ "./node_modules/_electron-is-dev@0.1.2@electron-is-dev/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
+
+
+/***/ }),
+
+/***/ "./node_modules/_electron-is@2.4.0@electron-is/is.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*
+ * Project: electron-is
+ * Version: 2.4.0
+ * Author: delvedor
+ * Twitter: @delvedor
+ * License: MIT
+ * GitHub: https://github.com/delvedor/electron-is
+ */
+
+
+
+const semver = __webpack_require__("./node_modules/_semver@5.5.0@semver/semver.js")
+const gt = semver.gt
+const lt = semver.lt
+const release = __webpack_require__("os").release
+const isDev = __webpack_require__("./node_modules/_electron-is-dev@0.1.2@electron-is-dev/index.js")
+
+// Constructor
+function IsApi () {}
+
+// Checks if we are in renderer process
+IsApi.prototype.renderer = function () {
+  return process.type === 'renderer'
+}
+
+// Checks if we are in main process
+IsApi.prototype.main = function () {
+  return process.type === 'browser'
+}
+
+// Checks if we are under Mac OS
+IsApi.prototype.osx = IsApi.prototype.macOS = function () {
+  return process.platform === 'darwin'
+}
+
+// Checks if we are under Windows OS
+IsApi.prototype.windows = function () {
+  return process.platform === 'win32'
+}
+
+// Checks if we are under Linux OS
+IsApi.prototype.linux = function () {
+  return process.platform === 'linux'
+}
+
+// Checks if we are the processor's arch is x86
+IsApi.prototype.x86 = function () {
+  return process.arch === 'ia32'
+}
+
+// Checks if we are the processor's arch is x64
+IsApi.prototype.x64 = function () {
+  return process.arch === 'x64'
+}
+
+// Checks if the env is setted to 'production'
+IsApi.prototype.production = function () {
+  return !isDev
+}
+
+// Checks if the env is setted to 'dev'
+IsApi.prototype.dev = function () {
+  return isDev
+}
+
+// Checks if the app is running in a sandbox on macOS
+IsApi.prototype.sandbox = function () {
+  return 'APP_SANDBOX_CONTAINER_ID' in process.env
+}
+// Checks if the app is running as a Mac App Store build
+IsApi.prototype.mas = function () {
+  return process.mas === true
+}
+// Checks if the app is running as a Windows Store (appx) build
+IsApi.prototype.windowsStore = function () {
+  return process.windowsStore === true
+}
+
+// checks if all the 'is functions' passed as arguments are true
+IsApi.prototype.all = function () {
+  const isFunctions = new Array(arguments.length)
+  for (var i = 0; i < isFunctions.length; i++) {
+    isFunctions[i] = arguments[i]
+  }
+  if (!isFunctions.length) return
+  for (i = 0; i < isFunctions.length; i++) {
+    if (!isFunctions[i]()) return false
+  }
+  return true
+}
+
+// checks if all the 'is functions' passed as arguments are false
+IsApi.prototype.none = function () {
+  const isFunctions = new Array(arguments.length)
+  for (var i = 0; i < isFunctions.length; i++) {
+    isFunctions[i] = arguments[i]
+  }
+  if (!isFunctions.length) return
+  for (i = 0; i < isFunctions.length; i++) {
+    if (isFunctions[i]()) return false
+  }
+  return true
+}
+
+// returns true if one of the 'is functions' passed as argument is true
+IsApi.prototype.one = function () {
+  const isFunctions = new Array(arguments.length)
+  for (var i = 0; i < isFunctions.length; i++) {
+    isFunctions[i] = arguments[i]
+  }
+  if (!isFunctions.length) return
+  for (i = 0; i < isFunctions.length; i++) {
+    if (isFunctions[i]()) return true
+  }
+  return false
+}
+
+// checks the if the given release is the same of the OS
+IsApi.prototype.release = function (requested) {
+  if (this.osx()) {
+    return requested === osxRelease()
+  } else if (this.windows()) {
+    requested = requested.split('.')
+    const actual = release().split('.')
+    if (requested.length === 2) {
+      return `${actual[0]}.${actual[1]}` === `${requested[0]}.${requested[1]}`
+    }
+    return `${actual[0]}.${actual[1]}.${actual[2]}` === `${requested[0]}.${requested[1]}.${requested[2]}`
+  } else {
+    // Not implemented for Linux yet
+    return null
+  }
+}
+
+// checks if the given release is greater than the current OS release
+IsApi.prototype.gtRelease = function (requested) {
+  if (this.osx()) {
+    return gt(requested, osxRelease())
+  } else if (this.windows()) {
+    requested = requested.split('.')
+    const actual = release().split('.')
+    if (requested.length === 2) {
+      return gt(`${requested[0]}.${requested[1]}.0`, `${actual[0]}.${actual[1]}.0`)
+    }
+    return gt(`${requested[0]}.${requested[1]}.${requested[2]}`, `${actual[0]}.${actual[1]}.${actual[2]}`)
+  } else {
+    // Not implemented for Linux yet
+    return null
+  }
+}
+
+// checks if the given release is less than the current OS release
+IsApi.prototype.ltRelease = function (requested) {
+  if (this.osx()) {
+    return lt(requested, osxRelease())
+  } else if (this.windows()) {
+    requested = requested.split('.')
+    const actual = release().split('.')
+    if (requested.length === 2) {
+      return lt(`${requested[0]}.${requested[1]}.0`, `${actual[0]}.${actual[1]}.0`)
+    }
+    return lt(`${requested[0]}.${requested[1]}.${requested[2]}`, `${actual[0]}.${actual[1]}.${actual[2]}`)
+  } else {
+    // Not implemented for Linux yet
+    return null
+  }
+}
+
+// returns the current osx release
+function osxRelease () {
+  const actual = release().split('.')
+  return `10.${actual[0] - 4}.${actual[1]}`
+}
+
+// exports
+module.exports = new IsApi()
+
+
+/***/ }),
+
 /***/ "./node_modules/_from2@2.3.0@from2/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -918,6 +1112,2231 @@ function noop () {}
 function defaults(opts) {
   opts = opts || {}
   return opts
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy-sync/copy-sync.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const mkdirpSync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js").mkdirsSync
+const utimesSync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/utimes.js").utimesMillisSync
+
+const notExist = Symbol('notExist')
+const existsReg = Symbol('existsReg')
+
+function copySync (src, dest, opts) {
+  if (typeof opts === 'function') {
+    opts = {filter: opts}
+  }
+
+  opts = opts || {}
+  opts.clobber = 'clobber' in opts ? !!opts.clobber : true // default to true for now
+  opts.overwrite = 'overwrite' in opts ? !!opts.overwrite : opts.clobber // overwrite falls back to clobber
+
+  // Warn about using preserveTimestamps on 32-bit node
+  if (opts.preserveTimestamps && process.arch === 'ia32') {
+    console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;\n
+    see https://github.com/jprichardson/node-fs-extra/issues/269`)
+  }
+
+  src = path.resolve(src)
+  dest = path.resolve(dest)
+
+  // don't allow src and dest to be the same
+  if (src === dest) throw new Error('Source and destination must not be the same.')
+
+  if (opts.filter && !opts.filter(src, dest)) return
+
+  const destParent = path.dirname(dest)
+  if (!fs.existsSync(destParent)) mkdirpSync(destParent)
+  return startCopy(src, dest, opts)
+}
+
+function startCopy (src, dest, opts) {
+  if (opts.filter && !opts.filter(src, dest)) return
+  return getStats(src, dest, opts)
+}
+
+function getStats (src, dest, opts) {
+  const statSync = opts.dereference ? fs.statSync : fs.lstatSync
+  const st = statSync(src)
+
+  if (st.isDirectory()) return onDir(st, src, dest, opts)
+  else if (st.isFile() ||
+           st.isCharacterDevice() ||
+           st.isBlockDevice()) return onFile(st, src, dest, opts)
+  else if (st.isSymbolicLink()) return onLink(src, dest, opts)
+}
+
+function onFile (srcStat, src, dest, opts) {
+  const resolvedPath = checkDest(dest)
+  if (resolvedPath === notExist) {
+    return copyFile(srcStat, src, dest, opts)
+  } else if (resolvedPath === existsReg) {
+    return mayCopyFile(srcStat, src, dest, opts)
+  } else {
+    if (src === resolvedPath) return
+    return mayCopyFile(srcStat, src, dest, opts)
+  }
+}
+
+function mayCopyFile (srcStat, src, dest, opts) {
+  if (opts.overwrite) {
+    fs.unlinkSync(dest)
+    return copyFile(srcStat, src, dest, opts)
+  } else if (opts.errorOnExist) {
+    throw new Error(`'${dest}' already exists`)
+  }
+}
+
+function copyFile (srcStat, src, dest, opts) {
+  if (typeof fs.copyFileSync === 'function') {
+    fs.copyFileSync(src, dest)
+    fs.chmodSync(dest, srcStat.mode)
+    if (opts.preserveTimestamps) {
+      return utimesSync(dest, srcStat.atime, srcStat.mtime)
+    }
+    return
+  }
+  return copyFileFallback(srcStat, src, dest, opts)
+}
+
+function copyFileFallback (srcStat, src, dest, opts) {
+  const BUF_LENGTH = 64 * 1024
+  const _buff = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/buffer.js")(BUF_LENGTH)
+
+  const fdr = fs.openSync(src, 'r')
+  const fdw = fs.openSync(dest, 'w', srcStat.mode)
+  let bytesRead = 1
+  let pos = 0
+
+  while (bytesRead > 0) {
+    bytesRead = fs.readSync(fdr, _buff, 0, BUF_LENGTH, pos)
+    fs.writeSync(fdw, _buff, 0, bytesRead)
+    pos += bytesRead
+  }
+
+  if (opts.preserveTimestamps) fs.futimesSync(fdw, srcStat.atime, srcStat.mtime)
+
+  fs.closeSync(fdr)
+  fs.closeSync(fdw)
+}
+
+function onDir (srcStat, src, dest, opts) {
+  const resolvedPath = checkDest(dest)
+  if (resolvedPath === notExist) {
+    if (isSrcSubdir(src, dest)) {
+      throw new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`)
+    }
+    return mkDirAndCopy(srcStat, src, dest, opts)
+  } else if (resolvedPath === existsReg) {
+    if (isSrcSubdir(src, dest)) {
+      throw new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`)
+    }
+    return mayCopyDir(src, dest, opts)
+  } else {
+    if (src === resolvedPath) return
+    return copyDir(src, dest, opts)
+  }
+}
+
+function mayCopyDir (src, dest, opts) {
+  if (!fs.statSync(dest).isDirectory()) {
+    throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`)
+  }
+  return copyDir(src, dest, opts)
+}
+
+function mkDirAndCopy (srcStat, src, dest, opts) {
+  fs.mkdirSync(dest, srcStat.mode)
+  fs.chmodSync(dest, srcStat.mode)
+  return copyDir(src, dest, opts)
+}
+
+function copyDir (src, dest, opts) {
+  fs.readdirSync(src).forEach(item => {
+    startCopy(path.join(src, item), path.join(dest, item), opts)
+  })
+}
+
+function onLink (src, dest, opts) {
+  let resolvedSrcPath = fs.readlinkSync(src)
+
+  if (opts.dereference) {
+    resolvedSrcPath = path.resolve(process.cwd(), resolvedSrcPath)
+  }
+
+  let resolvedDestPath = checkDest(dest)
+  if (resolvedDestPath === notExist || resolvedDestPath === existsReg) {
+    // if dest already exists, fs throws error anyway,
+    // so no need to guard against it here.
+    return fs.symlinkSync(resolvedSrcPath, dest)
+  } else {
+    if (opts.dereference) {
+      resolvedDestPath = path.resolve(process.cwd(), resolvedDestPath)
+    }
+    if (resolvedDestPath === resolvedSrcPath) return
+
+    // prevent copy if src is a subdir of dest since unlinking
+    // dest in this case would result in removing src contents
+    // and therefore a broken symlink would be created.
+    if (fs.statSync(dest).isDirectory() && isSrcSubdir(resolvedDestPath, resolvedSrcPath)) {
+      throw new Error(`Cannot overwrite '${resolvedDestPath}' with '${resolvedSrcPath}'.`)
+    }
+    return copyLink(resolvedSrcPath, dest)
+  }
+}
+
+function copyLink (resolvedSrcPath, dest) {
+  fs.unlinkSync(dest)
+  return fs.symlinkSync(resolvedSrcPath, dest)
+}
+
+// check if dest exists and/or is a symlink
+function checkDest (dest) {
+  let resolvedPath
+  try {
+    resolvedPath = fs.readlinkSync(dest)
+  } catch (err) {
+    if (err.code === 'ENOENT') return notExist
+
+    // dest exists and is a regular file or directory, Windows may throw UNKNOWN error
+    if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return existsReg
+
+    throw err
+  }
+  return resolvedPath // dest exists and is a symlink
+}
+
+// return true if dest is a subdir of src, otherwise false.
+// extract dest base dir and check if that is the same as src basename
+function isSrcSubdir (src, dest) {
+  const baseDir = dest.split(path.dirname(src) + path.sep)[1]
+  if (baseDir) {
+    const destBasename = baseDir.split(path.sep)[0]
+    if (destBasename) {
+      return src !== dest && dest.indexOf(src) > -1 && destBasename === path.basename(src)
+    }
+    return false
+  }
+  return false
+}
+
+module.exports = copySync
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy-sync/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = {
+  copySync: __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy-sync/copy-sync.js")
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy/copy.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const mkdirp = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js").mkdirs
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+const utimes = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/utimes.js").utimesMillis
+
+const notExist = Symbol('notExist')
+const existsReg = Symbol('existsReg')
+
+function copy (src, dest, opts, cb) {
+  if (typeof opts === 'function' && !cb) {
+    cb = opts
+    opts = {}
+  } else if (typeof opts === 'function') {
+    opts = {filter: opts}
+  }
+
+  cb = cb || function () {}
+  opts = opts || {}
+
+  opts.clobber = 'clobber' in opts ? !!opts.clobber : true // default to true for now
+  opts.overwrite = 'overwrite' in opts ? !!opts.overwrite : opts.clobber // overwrite falls back to clobber
+
+  // Warn about using preserveTimestamps on 32-bit node
+  if (opts.preserveTimestamps && process.arch === 'ia32') {
+    console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;\n
+    see https://github.com/jprichardson/node-fs-extra/issues/269`)
+  }
+
+  src = path.resolve(src)
+  dest = path.resolve(dest)
+
+  // don't allow src and dest to be the same
+  if (src === dest) return cb(new Error('Source and destination must not be the same.'))
+
+  if (opts.filter) return handleFilter(checkParentDir, src, dest, opts, cb)
+  return checkParentDir(src, dest, opts, cb)
+}
+
+function checkParentDir (src, dest, opts, cb) {
+  const destParent = path.dirname(dest)
+  pathExists(destParent, (err, dirExists) => {
+    if (err) return cb(err)
+    if (dirExists) return startCopy(src, dest, opts, cb)
+    mkdirp(destParent, err => {
+      if (err) return cb(err)
+      return startCopy(src, dest, opts, cb)
+    })
+  })
+}
+
+function startCopy (src, dest, opts, cb) {
+  if (opts.filter) return handleFilter(getStats, src, dest, opts, cb)
+  return getStats(src, dest, opts, cb)
+}
+
+function handleFilter (onInclude, src, dest, opts, cb) {
+  Promise.resolve(opts.filter(src, dest))
+    .then(include => {
+      if (include) return onInclude(src, dest, opts, cb)
+      return cb()
+    }, error => cb(error))
+}
+
+function getStats (src, dest, opts, cb) {
+  const stat = opts.dereference ? fs.stat : fs.lstat
+  stat(src, (err, st) => {
+    if (err) return cb(err)
+
+    if (st.isDirectory()) return onDir(st, src, dest, opts, cb)
+    else if (st.isFile() ||
+             st.isCharacterDevice() ||
+             st.isBlockDevice()) return onFile(st, src, dest, opts, cb)
+    else if (st.isSymbolicLink()) return onLink(src, dest, opts, cb)
+  })
+}
+
+function onFile (srcStat, src, dest, opts, cb) {
+  checkDest(dest, (err, resolvedPath) => {
+    if (err) return cb(err)
+    if (resolvedPath === notExist) {
+      return copyFile(srcStat, src, dest, opts, cb)
+    } else if (resolvedPath === existsReg) {
+      return mayCopyFile(srcStat, src, dest, opts, cb)
+    } else {
+      if (src === resolvedPath) return cb()
+      return mayCopyFile(srcStat, src, dest, opts, cb)
+    }
+  })
+}
+
+function mayCopyFile (srcStat, src, dest, opts, cb) {
+  if (opts.overwrite) {
+    fs.unlink(dest, err => {
+      if (err) return cb(err)
+      return copyFile(srcStat, src, dest, opts, cb)
+    })
+  } else if (opts.errorOnExist) {
+    return cb(new Error(`'${dest}' already exists`))
+  } else return cb()
+}
+
+function copyFile (srcStat, src, dest, opts, cb) {
+  if (typeof fs.copyFile === 'function') {
+    return fs.copyFile(src, dest, err => {
+      if (err) return cb(err)
+      return setDestModeAndTimestamps(srcStat, dest, opts, cb)
+    })
+  }
+  return copyFileFallback(srcStat, src, dest, opts, cb)
+}
+
+function copyFileFallback (srcStat, src, dest, opts, cb) {
+  const rs = fs.createReadStream(src)
+  rs.on('error', err => cb(err))
+    .once('open', () => {
+      const ws = fs.createWriteStream(dest, { mode: srcStat.mode })
+      ws.on('error', err => cb(err))
+        .on('open', () => rs.pipe(ws))
+        .once('close', () => setDestModeAndTimestamps(srcStat, dest, opts, cb))
+    })
+}
+
+function setDestModeAndTimestamps (srcStat, dest, opts, cb) {
+  fs.chmod(dest, srcStat.mode, err => {
+    if (err) return cb(err)
+    if (opts.preserveTimestamps) {
+      return utimes(dest, srcStat.atime, srcStat.mtime, cb)
+    }
+    return cb()
+  })
+}
+
+function onDir (srcStat, src, dest, opts, cb) {
+  checkDest(dest, (err, resolvedPath) => {
+    if (err) return cb(err)
+    if (resolvedPath === notExist) {
+      if (isSrcSubdir(src, dest)) {
+        return cb(new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`))
+      }
+      return mkDirAndCopy(srcStat, src, dest, opts, cb)
+    } else if (resolvedPath === existsReg) {
+      if (isSrcSubdir(src, dest)) {
+        return cb(new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`))
+      }
+      return mayCopyDir(src, dest, opts, cb)
+    } else {
+      if (src === resolvedPath) return cb()
+      return copyDir(src, dest, opts, cb)
+    }
+  })
+}
+
+function mayCopyDir (src, dest, opts, cb) {
+  fs.stat(dest, (err, st) => {
+    if (err) return cb(err)
+    if (!st.isDirectory()) {
+      return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`))
+    }
+    return copyDir(src, dest, opts, cb)
+  })
+}
+
+function mkDirAndCopy (srcStat, src, dest, opts, cb) {
+  fs.mkdir(dest, srcStat.mode, err => {
+    if (err) return cb(err)
+    fs.chmod(dest, srcStat.mode, err => {
+      if (err) return cb(err)
+      return copyDir(src, dest, opts, cb)
+    })
+  })
+}
+
+function copyDir (src, dest, opts, cb) {
+  fs.readdir(src, (err, items) => {
+    if (err) return cb(err)
+    return copyDirItems(items, src, dest, opts, cb)
+  })
+}
+
+function copyDirItems (items, src, dest, opts, cb) {
+  const item = items.pop()
+  if (!item) return cb()
+  startCopy(path.join(src, item), path.join(dest, item), opts, err => {
+    if (err) return cb(err)
+    return copyDirItems(items, src, dest, opts, cb)
+  })
+}
+
+function onLink (src, dest, opts, cb) {
+  fs.readlink(src, (err, resolvedSrcPath) => {
+    if (err) return cb(err)
+
+    if (opts.dereference) {
+      resolvedSrcPath = path.resolve(process.cwd(), resolvedSrcPath)
+    }
+
+    checkDest(dest, (err, resolvedDestPath) => {
+      if (err) return cb(err)
+
+      if (resolvedDestPath === notExist || resolvedDestPath === existsReg) {
+        // if dest already exists, fs throws error anyway,
+        // so no need to guard against it here.
+        return fs.symlink(resolvedSrcPath, dest, cb)
+      } else {
+        if (opts.dereference) {
+          resolvedDestPath = path.resolve(process.cwd(), resolvedDestPath)
+        }
+        if (resolvedDestPath === resolvedSrcPath) return cb()
+
+        // prevent copy if src is a subdir of dest since unlinking
+        // dest in this case would result in removing src contents
+        // and therefore a broken symlink would be created.
+        fs.stat(dest, (err, st) => {
+          if (err) return cb(err)
+          if (st.isDirectory() && isSrcSubdir(resolvedDestPath, resolvedSrcPath)) {
+            return cb(new Error(`Cannot overwrite '${resolvedDestPath}' with '${resolvedSrcPath}'.`))
+          }
+          return copyLink(resolvedSrcPath, dest, cb)
+        })
+      }
+    })
+  })
+}
+
+function copyLink (resolvedSrcPath, dest, cb) {
+  fs.unlink(dest, err => {
+    if (err) return cb(err)
+    return fs.symlink(resolvedSrcPath, dest, cb)
+  })
+}
+
+// check if dest exists and/or is a symlink
+function checkDest (dest, cb) {
+  fs.readlink(dest, (err, resolvedPath) => {
+    if (err) {
+      if (err.code === 'ENOENT') return cb(null, notExist)
+
+      // dest exists and is a regular file or directory, Windows may throw UNKNOWN error.
+      if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return cb(null, existsReg)
+
+      return cb(err)
+    }
+    return cb(null, resolvedPath) // dest exists and is a symlink
+  })
+}
+
+// return true if dest is a subdir of src, otherwise false.
+// extract dest base dir and check if that is the same as src basename
+function isSrcSubdir (src, dest) {
+  const baseDir = dest.split(path.dirname(src) + path.sep)[1]
+  if (baseDir) {
+    const destBasename = baseDir.split(path.sep)[0]
+    if (destBasename) {
+      return src !== dest && dest.indexOf(src) > -1 && destBasename === path.basename(src)
+    }
+    return false
+  }
+  return false
+}
+
+module.exports = copy
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+module.exports = {
+  copy: u(__webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy/copy.js"))
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/empty/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const fs = __webpack_require__("fs")
+const path = __webpack_require__("path")
+const mkdir = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const remove = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/index.js")
+
+const emptyDir = u(function emptyDir (dir, callback) {
+  callback = callback || function () {}
+  fs.readdir(dir, (err, items) => {
+    if (err) return mkdir.mkdirs(dir, callback)
+
+    items = items.map(item => path.join(dir, item))
+
+    deleteItem()
+
+    function deleteItem () {
+      const item = items.pop()
+      if (!item) return callback()
+      remove.remove(item, err => {
+        if (err) return callback(err)
+        deleteItem()
+      })
+    }
+  })
+})
+
+function emptyDirSync (dir) {
+  let items
+  try {
+    items = fs.readdirSync(dir)
+  } catch (err) {
+    return mkdir.mkdirsSync(dir)
+  }
+
+  items.forEach(item => {
+    item = path.join(dir, item)
+    remove.removeSync(item)
+  })
+}
+
+module.exports = {
+  emptyDirSync,
+  emptydirSync: emptyDirSync,
+  emptyDir,
+  emptydir: emptyDir
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/file.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const path = __webpack_require__("path")
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const mkdir = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+
+function createFile (file, callback) {
+  function makeFile () {
+    fs.writeFile(file, '', err => {
+      if (err) return callback(err)
+      callback()
+    })
+  }
+
+  fs.stat(file, (err, stats) => { // eslint-disable-line handle-callback-err
+    if (!err && stats.isFile()) return callback()
+    const dir = path.dirname(file)
+    pathExists(dir, (err, dirExists) => {
+      if (err) return callback(err)
+      if (dirExists) return makeFile()
+      mkdir.mkdirs(dir, err => {
+        if (err) return callback(err)
+        makeFile()
+      })
+    })
+  })
+}
+
+function createFileSync (file) {
+  let stats
+  try {
+    stats = fs.statSync(file)
+  } catch (e) {}
+  if (stats && stats.isFile()) return
+
+  const dir = path.dirname(file)
+  if (!fs.existsSync(dir)) {
+    mkdir.mkdirsSync(dir)
+  }
+
+  fs.writeFileSync(file, '')
+}
+
+module.exports = {
+  createFile: u(createFile),
+  createFileSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const file = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/file.js")
+const link = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/link.js")
+const symlink = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/symlink.js")
+
+module.exports = {
+  // file
+  createFile: file.createFile,
+  createFileSync: file.createFileSync,
+  ensureFile: file.createFile,
+  ensureFileSync: file.createFileSync,
+  // link
+  createLink: link.createLink,
+  createLinkSync: link.createLinkSync,
+  ensureLink: link.createLink,
+  ensureLinkSync: link.createLinkSync,
+  // symlink
+  createSymlink: symlink.createSymlink,
+  createSymlinkSync: symlink.createSymlinkSync,
+  ensureSymlink: symlink.createSymlink,
+  ensureSymlinkSync: symlink.createSymlinkSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/link.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const path = __webpack_require__("path")
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const mkdir = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+
+function createLink (srcpath, dstpath, callback) {
+  function makeLink (srcpath, dstpath) {
+    fs.link(srcpath, dstpath, err => {
+      if (err) return callback(err)
+      callback(null)
+    })
+  }
+
+  pathExists(dstpath, (err, destinationExists) => {
+    if (err) return callback(err)
+    if (destinationExists) return callback(null)
+    fs.lstat(srcpath, (err, stat) => {
+      if (err) {
+        err.message = err.message.replace('lstat', 'ensureLink')
+        return callback(err)
+      }
+
+      const dir = path.dirname(dstpath)
+      pathExists(dir, (err, dirExists) => {
+        if (err) return callback(err)
+        if (dirExists) return makeLink(srcpath, dstpath)
+        mkdir.mkdirs(dir, err => {
+          if (err) return callback(err)
+          makeLink(srcpath, dstpath)
+        })
+      })
+    })
+  })
+}
+
+function createLinkSync (srcpath, dstpath, callback) {
+  const destinationExists = fs.existsSync(dstpath)
+  if (destinationExists) return undefined
+
+  try {
+    fs.lstatSync(srcpath)
+  } catch (err) {
+    err.message = err.message.replace('lstat', 'ensureLink')
+    throw err
+  }
+
+  const dir = path.dirname(dstpath)
+  const dirExists = fs.existsSync(dir)
+  if (dirExists) return fs.linkSync(srcpath, dstpath)
+  mkdir.mkdirsSync(dir)
+
+  return fs.linkSync(srcpath, dstpath)
+}
+
+module.exports = {
+  createLink: u(createLink),
+  createLinkSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/symlink-paths.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const path = __webpack_require__("path")
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+
+/**
+ * Function that returns two types of paths, one relative to symlink, and one
+ * relative to the current working directory. Checks if path is absolute or
+ * relative. If the path is relative, this function checks if the path is
+ * relative to symlink or relative to current working directory. This is an
+ * initiative to find a smarter `srcpath` to supply when building symlinks.
+ * This allows you to determine which path to use out of one of three possible
+ * types of source paths. The first is an absolute path. This is detected by
+ * `path.isAbsolute()`. When an absolute path is provided, it is checked to
+ * see if it exists. If it does it's used, if not an error is returned
+ * (callback)/ thrown (sync). The other two options for `srcpath` are a
+ * relative url. By default Node's `fs.symlink` works by creating a symlink
+ * using `dstpath` and expects the `srcpath` to be relative to the newly
+ * created symlink. If you provide a `srcpath` that does not exist on the file
+ * system it results in a broken symlink. To minimize this, the function
+ * checks to see if the 'relative to symlink' source file exists, and if it
+ * does it will use it. If it does not, it checks if there's a file that
+ * exists that is relative to the current working directory, if does its used.
+ * This preserves the expectations of the original fs.symlink spec and adds
+ * the ability to pass in `relative to current working direcotry` paths.
+ */
+
+function symlinkPaths (srcpath, dstpath, callback) {
+  if (path.isAbsolute(srcpath)) {
+    return fs.lstat(srcpath, (err, stat) => {
+      if (err) {
+        err.message = err.message.replace('lstat', 'ensureSymlink')
+        return callback(err)
+      }
+      return callback(null, {
+        'toCwd': srcpath,
+        'toDst': srcpath
+      })
+    })
+  } else {
+    const dstdir = path.dirname(dstpath)
+    const relativeToDst = path.join(dstdir, srcpath)
+    return pathExists(relativeToDst, (err, exists) => {
+      if (err) return callback(err)
+      if (exists) {
+        return callback(null, {
+          'toCwd': relativeToDst,
+          'toDst': srcpath
+        })
+      } else {
+        return fs.lstat(srcpath, (err, stat) => {
+          if (err) {
+            err.message = err.message.replace('lstat', 'ensureSymlink')
+            return callback(err)
+          }
+          return callback(null, {
+            'toCwd': srcpath,
+            'toDst': path.relative(dstdir, srcpath)
+          })
+        })
+      }
+    })
+  }
+}
+
+function symlinkPathsSync (srcpath, dstpath) {
+  let exists
+  if (path.isAbsolute(srcpath)) {
+    exists = fs.existsSync(srcpath)
+    if (!exists) throw new Error('absolute srcpath does not exist')
+    return {
+      'toCwd': srcpath,
+      'toDst': srcpath
+    }
+  } else {
+    const dstdir = path.dirname(dstpath)
+    const relativeToDst = path.join(dstdir, srcpath)
+    exists = fs.existsSync(relativeToDst)
+    if (exists) {
+      return {
+        'toCwd': relativeToDst,
+        'toDst': srcpath
+      }
+    } else {
+      exists = fs.existsSync(srcpath)
+      if (!exists) throw new Error('relative srcpath does not exist')
+      return {
+        'toCwd': srcpath,
+        'toDst': path.relative(dstdir, srcpath)
+      }
+    }
+  }
+}
+
+module.exports = {
+  symlinkPaths,
+  symlinkPathsSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/symlink-type.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+
+function symlinkType (srcpath, type, callback) {
+  callback = (typeof type === 'function') ? type : callback
+  type = (typeof type === 'function') ? false : type
+  if (type) return callback(null, type)
+  fs.lstat(srcpath, (err, stats) => {
+    if (err) return callback(null, 'file')
+    type = (stats && stats.isDirectory()) ? 'dir' : 'file'
+    callback(null, type)
+  })
+}
+
+function symlinkTypeSync (srcpath, type) {
+  let stats
+
+  if (type) return type
+  try {
+    stats = fs.lstatSync(srcpath)
+  } catch (e) {
+    return 'file'
+  }
+  return (stats && stats.isDirectory()) ? 'dir' : 'file'
+}
+
+module.exports = {
+  symlinkType,
+  symlinkTypeSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/symlink.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const path = __webpack_require__("path")
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const _mkdirs = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const mkdirs = _mkdirs.mkdirs
+const mkdirsSync = _mkdirs.mkdirsSync
+
+const _symlinkPaths = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/symlink-paths.js")
+const symlinkPaths = _symlinkPaths.symlinkPaths
+const symlinkPathsSync = _symlinkPaths.symlinkPathsSync
+
+const _symlinkType = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/symlink-type.js")
+const symlinkType = _symlinkType.symlinkType
+const symlinkTypeSync = _symlinkType.symlinkTypeSync
+
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+
+function createSymlink (srcpath, dstpath, type, callback) {
+  callback = (typeof type === 'function') ? type : callback
+  type = (typeof type === 'function') ? false : type
+
+  pathExists(dstpath, (err, destinationExists) => {
+    if (err) return callback(err)
+    if (destinationExists) return callback(null)
+    symlinkPaths(srcpath, dstpath, (err, relative) => {
+      if (err) return callback(err)
+      srcpath = relative.toDst
+      symlinkType(relative.toCwd, type, (err, type) => {
+        if (err) return callback(err)
+        const dir = path.dirname(dstpath)
+        pathExists(dir, (err, dirExists) => {
+          if (err) return callback(err)
+          if (dirExists) return fs.symlink(srcpath, dstpath, type, callback)
+          mkdirs(dir, err => {
+            if (err) return callback(err)
+            fs.symlink(srcpath, dstpath, type, callback)
+          })
+        })
+      })
+    })
+  })
+}
+
+function createSymlinkSync (srcpath, dstpath, type, callback) {
+  callback = (typeof type === 'function') ? type : callback
+  type = (typeof type === 'function') ? false : type
+
+  const destinationExists = fs.existsSync(dstpath)
+  if (destinationExists) return undefined
+
+  const relative = symlinkPathsSync(srcpath, dstpath)
+  srcpath = relative.toDst
+  type = symlinkTypeSync(relative.toCwd, type)
+  const dir = path.dirname(dstpath)
+  const exists = fs.existsSync(dir)
+  if (exists) return fs.symlinkSync(srcpath, dstpath, type)
+  mkdirsSync(dir)
+  return fs.symlinkSync(srcpath, dstpath, type)
+}
+
+module.exports = {
+  createSymlink: u(createSymlink),
+  createSymlinkSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/fs/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+// This is adapted from https://github.com/normalize/mz
+// Copyright (c) 2014-2016 Jonathan Ong me@jongleberry.com and Contributors
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+
+const api = [
+  'access',
+  'appendFile',
+  'chmod',
+  'chown',
+  'close',
+  'copyFile',
+  'fchmod',
+  'fchown',
+  'fdatasync',
+  'fstat',
+  'fsync',
+  'ftruncate',
+  'futimes',
+  'lchown',
+  'link',
+  'lstat',
+  'mkdir',
+  'mkdtemp',
+  'open',
+  'readFile',
+  'readdir',
+  'readlink',
+  'realpath',
+  'rename',
+  'rmdir',
+  'stat',
+  'symlink',
+  'truncate',
+  'unlink',
+  'utimes',
+  'writeFile'
+].filter(key => {
+  // Some commands are not available on some systems. Ex:
+  // fs.copyFile was added in Node.js v8.5.0
+  // fs.mkdtemp was added in Node.js v5.10.0
+  // fs.lchown is not available on at least some Linux
+  return typeof fs[key] === 'function'
+})
+
+// Export all keys:
+Object.keys(fs).forEach(key => {
+  exports[key] = fs[key]
+})
+
+// Universalify async methods:
+api.forEach(method => {
+  exports[method] = u(fs[method])
+})
+
+// We differ from mz/fs in that we still ship the old, broken, fs.exists()
+// since we are a drop-in replacement for the native module
+exports.exists = function (filename, callback) {
+  if (typeof callback === 'function') {
+    return fs.exists(filename, callback)
+  }
+  return new Promise(resolve => {
+    return fs.exists(filename, resolve)
+  })
+}
+
+// fs.read() & fs.write need special treatment due to multiple callback args
+
+exports.read = function (fd, buffer, offset, length, position, callback) {
+  if (typeof callback === 'function') {
+    return fs.read(fd, buffer, offset, length, position, callback)
+  }
+  return new Promise((resolve, reject) => {
+    fs.read(fd, buffer, offset, length, position, (err, bytesRead, buffer) => {
+      if (err) return reject(err)
+      resolve({ bytesRead, buffer })
+    })
+  })
+}
+
+// Function signature can be
+// fs.write(fd, buffer[, offset[, length[, position]]], callback)
+// OR
+// fs.write(fd, string[, position[, encoding]], callback)
+// so we need to handle both cases
+exports.write = function (fd, buffer, a, b, c, callback) {
+  if (typeof arguments[arguments.length - 1] === 'function') {
+    return fs.write(fd, buffer, a, b, c, callback)
+  }
+
+  // Check for old, depricated fs.write(fd, string[, position[, encoding]], callback)
+  if (typeof buffer === 'string') {
+    return new Promise((resolve, reject) => {
+      fs.write(fd, buffer, a, b, (err, bytesWritten, buffer) => {
+        if (err) return reject(err)
+        resolve({ bytesWritten, buffer })
+      })
+    })
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.write(fd, buffer, a, b, c, (err, bytesWritten, buffer) => {
+      if (err) return reject(err)
+      resolve({ bytesWritten, buffer })
+    })
+  })
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const assign = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/assign.js")
+
+const fs = {}
+
+// Export graceful-fs:
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/fs/index.js"))
+// Export extra methods:
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy-sync/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/move/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/move-sync/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/empty/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/ensure/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/output/index.js"))
+assign(fs, __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js"))
+
+module.exports = fs
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const jsonFile = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/jsonfile.js")
+
+jsonFile.outputJson = u(__webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/output-json.js"))
+jsonFile.outputJsonSync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/output-json-sync.js")
+// aliases
+jsonFile.outputJSON = jsonFile.outputJson
+jsonFile.outputJSONSync = jsonFile.outputJsonSync
+jsonFile.writeJSON = jsonFile.writeJson
+jsonFile.writeJSONSync = jsonFile.writeJsonSync
+jsonFile.readJSON = jsonFile.readJson
+jsonFile.readJSONSync = jsonFile.readJsonSync
+
+module.exports = jsonFile
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/jsonfile.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const jsonFile = __webpack_require__("./node_modules/_jsonfile@4.0.0@jsonfile/index.js")
+
+module.exports = {
+  // jsonfile exports
+  readJson: u(jsonFile.readFile),
+  readJsonSync: jsonFile.readFileSync,
+  writeJson: u(jsonFile.writeFile),
+  writeJsonSync: jsonFile.writeFileSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/output-json-sync.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const mkdir = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const jsonFile = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/jsonfile.js")
+
+function outputJsonSync (file, data, options) {
+  const dir = path.dirname(file)
+
+  if (!fs.existsSync(dir)) {
+    mkdir.mkdirsSync(dir)
+  }
+
+  jsonFile.writeJsonSync(file, data, options)
+}
+
+module.exports = outputJsonSync
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/output-json.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const path = __webpack_require__("path")
+const mkdir = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+const jsonFile = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/json/jsonfile.js")
+
+function outputJson (file, data, options, callback) {
+  if (typeof options === 'function') {
+    callback = options
+    options = {}
+  }
+
+  const dir = path.dirname(file)
+
+  pathExists(dir, (err, itDoes) => {
+    if (err) return callback(err)
+    if (itDoes) return jsonFile.writeJson(file, data, options, callback)
+
+    mkdir.mkdirs(dir, err => {
+      if (err) return callback(err)
+      jsonFile.writeJson(file, data, options, callback)
+    })
+  })
+}
+
+module.exports = outputJson
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const mkdirs = u(__webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/mkdirs.js"))
+const mkdirsSync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/mkdirs-sync.js")
+
+module.exports = {
+  mkdirs: mkdirs,
+  mkdirsSync: mkdirsSync,
+  // alias
+  mkdirp: mkdirs,
+  mkdirpSync: mkdirsSync,
+  ensureDir: mkdirs,
+  ensureDirSync: mkdirsSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/mkdirs-sync.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const invalidWin32Path = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/win32.js").invalidWin32Path
+
+const o777 = parseInt('0777', 8)
+
+function mkdirsSync (p, opts, made) {
+  if (!opts || typeof opts !== 'object') {
+    opts = { mode: opts }
+  }
+
+  let mode = opts.mode
+  const xfs = opts.fs || fs
+
+  if (process.platform === 'win32' && invalidWin32Path(p)) {
+    const errInval = new Error(p + ' contains invalid WIN32 path characters.')
+    errInval.code = 'EINVAL'
+    throw errInval
+  }
+
+  if (mode === undefined) {
+    mode = o777 & (~process.umask())
+  }
+  if (!made) made = null
+
+  p = path.resolve(p)
+
+  try {
+    xfs.mkdirSync(p, mode)
+    made = made || p
+  } catch (err0) {
+    switch (err0.code) {
+      case 'ENOENT':
+        if (path.dirname(p) === p) throw err0
+        made = mkdirsSync(path.dirname(p), opts, made)
+        mkdirsSync(p, opts, made)
+        break
+
+      // In the case of any other error, just see if there's a dir
+      // there already.  If so, then hooray!  If not, then something
+      // is borked.
+      default:
+        let stat
+        try {
+          stat = xfs.statSync(p)
+        } catch (err1) {
+          throw err0
+        }
+        if (!stat.isDirectory()) throw err0
+        break
+    }
+  }
+
+  return made
+}
+
+module.exports = mkdirsSync
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/mkdirs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const invalidWin32Path = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/win32.js").invalidWin32Path
+
+const o777 = parseInt('0777', 8)
+
+function mkdirs (p, opts, callback, made) {
+  if (typeof opts === 'function') {
+    callback = opts
+    opts = {}
+  } else if (!opts || typeof opts !== 'object') {
+    opts = { mode: opts }
+  }
+
+  if (process.platform === 'win32' && invalidWin32Path(p)) {
+    const errInval = new Error(p + ' contains invalid WIN32 path characters.')
+    errInval.code = 'EINVAL'
+    return callback(errInval)
+  }
+
+  let mode = opts.mode
+  const xfs = opts.fs || fs
+
+  if (mode === undefined) {
+    mode = o777 & (~process.umask())
+  }
+  if (!made) made = null
+
+  callback = callback || function () {}
+  p = path.resolve(p)
+
+  xfs.mkdir(p, mode, er => {
+    if (!er) {
+      made = made || p
+      return callback(null, made)
+    }
+    switch (er.code) {
+      case 'ENOENT':
+        if (path.dirname(p) === p) return callback(er)
+        mkdirs(path.dirname(p), opts, (er, made) => {
+          if (er) callback(er, made)
+          else mkdirs(p, opts, callback, made)
+        })
+        break
+
+      // In the case of any other error, just see if there's a dir
+      // there already.  If so, then hooray!  If not, then something
+      // is borked.
+      default:
+        xfs.stat(p, (er2, stat) => {
+          // if the stat fails, then that's super weird.
+          // let the original error be the failure reason.
+          if (er2 || !stat.isDirectory()) callback(er, made)
+          else callback(null, made)
+        })
+        break
+    }
+  })
+}
+
+module.exports = mkdirs
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/win32.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const path = __webpack_require__("path")
+
+// get drive on windows
+function getRootPath (p) {
+  p = path.normalize(path.resolve(p)).split(path.sep)
+  if (p.length > 0) return p[0]
+  return null
+}
+
+// http://stackoverflow.com/a/62888/10333 contains more accurate
+// TODO: expand to include the rest
+const INVALID_PATH_CHARS = /[<>:"|?*]/
+
+function invalidWin32Path (p) {
+  const rp = getRootPath(p)
+  p = p.replace(rp, '')
+  return INVALID_PATH_CHARS.test(p)
+}
+
+module.exports = {
+  getRootPath,
+  invalidWin32Path
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/move-sync/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const copySync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy-sync/index.js").copySync
+const removeSync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/index.js").removeSync
+const mkdirpSync = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js").mkdirsSync
+const buffer = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/buffer.js")
+
+function moveSync (src, dest, options) {
+  options = options || {}
+  const overwrite = options.overwrite || options.clobber || false
+
+  src = path.resolve(src)
+  dest = path.resolve(dest)
+
+  if (src === dest) return fs.accessSync(src)
+
+  if (isSrcSubdir(src, dest)) throw new Error(`Cannot move '${src}' into itself '${dest}'.`)
+
+  mkdirpSync(path.dirname(dest))
+  tryRenameSync()
+
+  function tryRenameSync () {
+    if (overwrite) {
+      try {
+        return fs.renameSync(src, dest)
+      } catch (err) {
+        if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST' || err.code === 'EPERM') {
+          removeSync(dest)
+          options.overwrite = false // just overwriteed it, no need to do it again
+          return moveSync(src, dest, options)
+        }
+
+        if (err.code !== 'EXDEV') throw err
+        return moveSyncAcrossDevice(src, dest, overwrite)
+      }
+    } else {
+      try {
+        fs.linkSync(src, dest)
+        return fs.unlinkSync(src)
+      } catch (err) {
+        if (err.code === 'EXDEV' || err.code === 'EISDIR' || err.code === 'EPERM' || err.code === 'ENOTSUP') {
+          return moveSyncAcrossDevice(src, dest, overwrite)
+        }
+        throw err
+      }
+    }
+  }
+}
+
+function moveSyncAcrossDevice (src, dest, overwrite) {
+  const stat = fs.statSync(src)
+
+  if (stat.isDirectory()) {
+    return moveDirSyncAcrossDevice(src, dest, overwrite)
+  } else {
+    return moveFileSyncAcrossDevice(src, dest, overwrite)
+  }
+}
+
+function moveFileSyncAcrossDevice (src, dest, overwrite) {
+  const BUF_LENGTH = 64 * 1024
+  const _buff = buffer(BUF_LENGTH)
+
+  const flags = overwrite ? 'w' : 'wx'
+
+  const fdr = fs.openSync(src, 'r')
+  const stat = fs.fstatSync(fdr)
+  const fdw = fs.openSync(dest, flags, stat.mode)
+  let bytesRead = 1
+  let pos = 0
+
+  while (bytesRead > 0) {
+    bytesRead = fs.readSync(fdr, _buff, 0, BUF_LENGTH, pos)
+    fs.writeSync(fdw, _buff, 0, bytesRead)
+    pos += bytesRead
+  }
+
+  fs.closeSync(fdr)
+  fs.closeSync(fdw)
+  return fs.unlinkSync(src)
+}
+
+function moveDirSyncAcrossDevice (src, dest, overwrite) {
+  const options = {
+    overwrite: false
+  }
+
+  if (overwrite) {
+    removeSync(dest)
+    tryCopySync()
+  } else {
+    tryCopySync()
+  }
+
+  function tryCopySync () {
+    copySync(src, dest, options)
+    return removeSync(src)
+  }
+}
+
+// return true if dest is a subdir of src, otherwise false.
+// extract dest base dir and check if that is the same as src basename
+function isSrcSubdir (src, dest) {
+  try {
+    return fs.statSync(src).isDirectory() &&
+           src !== dest &&
+           dest.indexOf(src) > -1 &&
+           dest.split(path.dirname(src) + path.sep)[1].split(path.sep)[0] === path.basename(src)
+  } catch (e) {
+    return false
+  }
+}
+
+module.exports = {
+  moveSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/move/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// most of this code was written by Andrew Kelley
+// licensed under the BSD license: see
+// https://github.com/andrewrk/node-mv/blob/master/package.json
+
+// this needs a cleanup
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const copy = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/copy/copy.js")
+const path = __webpack_require__("path")
+const remove = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/index.js").remove
+const mkdirp = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js").mkdirs
+
+function move (src, dest, options, callback) {
+  if (typeof options === 'function') {
+    callback = options
+    options = {}
+  }
+
+  const overwrite = options.overwrite || options.clobber || false
+
+  isSrcSubdir(src, dest, (err, itIs) => {
+    if (err) return callback(err)
+    if (itIs) return callback(new Error(`Cannot move '${src}' to a subdirectory of itself, '${dest}'.`))
+    mkdirp(path.dirname(dest), err => {
+      if (err) return callback(err)
+      doRename()
+    })
+  })
+
+  function doRename () {
+    if (path.resolve(src) === path.resolve(dest)) {
+      fs.access(src, callback)
+    } else if (overwrite) {
+      fs.rename(src, dest, err => {
+        if (!err) return callback()
+
+        if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST') {
+          remove(dest, err => {
+            if (err) return callback(err)
+            options.overwrite = false // just overwriteed it, no need to do it again
+            move(src, dest, options, callback)
+          })
+          return
+        }
+
+        // weird Windows shit
+        if (err.code === 'EPERM') {
+          setTimeout(() => {
+            remove(dest, err => {
+              if (err) return callback(err)
+              options.overwrite = false
+              move(src, dest, options, callback)
+            })
+          }, 200)
+          return
+        }
+
+        if (err.code !== 'EXDEV') return callback(err)
+        moveAcrossDevice(src, dest, overwrite, callback)
+      })
+    } else {
+      fs.link(src, dest, err => {
+        if (err) {
+          if (err.code === 'EXDEV' || err.code === 'EISDIR' || err.code === 'EPERM' || err.code === 'ENOTSUP') {
+            return moveAcrossDevice(src, dest, overwrite, callback)
+          }
+          return callback(err)
+        }
+        return fs.unlink(src, callback)
+      })
+    }
+  }
+}
+
+function moveAcrossDevice (src, dest, overwrite, callback) {
+  fs.stat(src, (err, stat) => {
+    if (err) return callback(err)
+
+    if (stat.isDirectory()) {
+      moveDirAcrossDevice(src, dest, overwrite, callback)
+    } else {
+      moveFileAcrossDevice(src, dest, overwrite, callback)
+    }
+  })
+}
+
+function moveFileAcrossDevice (src, dest, overwrite, callback) {
+  const flags = overwrite ? 'w' : 'wx'
+  const ins = fs.createReadStream(src)
+  const outs = fs.createWriteStream(dest, { flags })
+
+  ins.on('error', err => {
+    ins.destroy()
+    outs.destroy()
+    outs.removeListener('close', onClose)
+
+    // may want to create a directory but `out` line above
+    // creates an empty file for us: See #108
+    // don't care about error here
+    fs.unlink(dest, () => {
+      // note: `err` here is from the input stream errror
+      if (err.code === 'EISDIR' || err.code === 'EPERM') {
+        moveDirAcrossDevice(src, dest, overwrite, callback)
+      } else {
+        callback(err)
+      }
+    })
+  })
+
+  outs.on('error', err => {
+    ins.destroy()
+    outs.destroy()
+    outs.removeListener('close', onClose)
+    callback(err)
+  })
+
+  outs.once('close', onClose)
+  ins.pipe(outs)
+
+  function onClose () {
+    fs.unlink(src, callback)
+  }
+}
+
+function moveDirAcrossDevice (src, dest, overwrite, callback) {
+  const options = {
+    overwrite: false
+  }
+
+  if (overwrite) {
+    remove(dest, err => {
+      if (err) return callback(err)
+      startCopy()
+    })
+  } else {
+    startCopy()
+  }
+
+  function startCopy () {
+    copy(src, dest, options, err => {
+      if (err) return callback(err)
+      remove(src, callback)
+    })
+  }
+}
+
+// return true if dest is a subdir of src, otherwise false.
+// extract dest base dir and check if that is the same as src basename
+function isSrcSubdir (src, dest, cb) {
+  fs.stat(src, (err, st) => {
+    if (err) return cb(err)
+    if (st.isDirectory()) {
+      const baseDir = dest.split(path.dirname(src) + path.sep)[1]
+      if (baseDir) {
+        const destBasename = baseDir.split(path.sep)[0]
+        if (destBasename) return cb(null, src !== dest && dest.indexOf(src) > -1 && destBasename === path.basename(src))
+        return cb(null, false)
+      }
+      return cb(null, false)
+    }
+    return cb(null, false)
+  })
+}
+
+module.exports = {
+  move: u(move)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/output/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const mkdir = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/mkdirs/index.js")
+const pathExists = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js").pathExists
+
+function outputFile (file, data, encoding, callback) {
+  if (typeof encoding === 'function') {
+    callback = encoding
+    encoding = 'utf8'
+  }
+
+  const dir = path.dirname(file)
+  pathExists(dir, (err, itDoes) => {
+    if (err) return callback(err)
+    if (itDoes) return fs.writeFile(file, data, encoding, callback)
+
+    mkdir.mkdirs(dir, err => {
+      if (err) return callback(err)
+
+      fs.writeFile(file, data, encoding, callback)
+    })
+  })
+}
+
+function outputFileSync (file, data, encoding) {
+  const dir = path.dirname(file)
+  if (fs.existsSync(dir)) {
+    return fs.writeFileSync.apply(fs, arguments)
+  }
+  mkdir.mkdirsSync(dir)
+  fs.writeFileSync.apply(fs, arguments)
+}
+
+module.exports = {
+  outputFile: u(outputFile),
+  outputFileSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/path-exists/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromPromise
+const fs = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/fs/index.js")
+
+function pathExists (path) {
+  return fs.access(path).then(() => true).catch(() => false)
+}
+
+module.exports = {
+  pathExists: u(pathExists),
+  pathExistsSync: fs.existsSync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const u = __webpack_require__("./node_modules/_universalify@0.1.1@universalify/index.js").fromCallback
+const rimraf = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/rimraf.js")
+
+module.exports = {
+  remove: u(rimraf),
+  removeSync: rimraf.sync
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/remove/rimraf.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const path = __webpack_require__("path")
+const assert = __webpack_require__("assert")
+
+const isWindows = (process.platform === 'win32')
+
+function defaults (options) {
+  const methods = [
+    'unlink',
+    'chmod',
+    'stat',
+    'lstat',
+    'rmdir',
+    'readdir'
+  ]
+  methods.forEach(m => {
+    options[m] = options[m] || fs[m]
+    m = m + 'Sync'
+    options[m] = options[m] || fs[m]
+  })
+
+  options.maxBusyTries = options.maxBusyTries || 3
+}
+
+function rimraf (p, options, cb) {
+  let busyTries = 0
+
+  if (typeof options === 'function') {
+    cb = options
+    options = {}
+  }
+
+  assert(p, 'rimraf: missing path')
+  assert.equal(typeof p, 'string', 'rimraf: path should be a string')
+  assert.equal(typeof cb, 'function', 'rimraf: callback function required')
+  assert(options, 'rimraf: invalid options argument provided')
+  assert.equal(typeof options, 'object', 'rimraf: options should be object')
+
+  defaults(options)
+
+  rimraf_(p, options, function CB (er) {
+    if (er) {
+      if ((er.code === 'EBUSY' || er.code === 'ENOTEMPTY' || er.code === 'EPERM') &&
+          busyTries < options.maxBusyTries) {
+        busyTries++
+        let time = busyTries * 100
+        // try again, with the same exact callback as this one.
+        return setTimeout(() => rimraf_(p, options, CB), time)
+      }
+
+      // already gone
+      if (er.code === 'ENOENT') er = null
+    }
+
+    cb(er)
+  })
+}
+
+// Two possible strategies.
+// 1. Assume it's a file.  unlink it, then do the dir stuff on EPERM or EISDIR
+// 2. Assume it's a directory.  readdir, then do the file stuff on ENOTDIR
+//
+// Both result in an extra syscall when you guess wrong.  However, there
+// are likely far more normal files in the world than directories.  This
+// is based on the assumption that a the average number of files per
+// directory is >= 1.
+//
+// If anyone ever complains about this, then I guess the strategy could
+// be made configurable somehow.  But until then, YAGNI.
+function rimraf_ (p, options, cb) {
+  assert(p)
+  assert(options)
+  assert(typeof cb === 'function')
+
+  // sunos lets the root user unlink directories, which is... weird.
+  // so we have to lstat here and make sure it's not a dir.
+  options.lstat(p, (er, st) => {
+    if (er && er.code === 'ENOENT') {
+      return cb(null)
+    }
+
+    // Windows can EPERM on stat.  Life is suffering.
+    if (er && er.code === 'EPERM' && isWindows) {
+      return fixWinEPERM(p, options, er, cb)
+    }
+
+    if (st && st.isDirectory()) {
+      return rmdir(p, options, er, cb)
+    }
+
+    options.unlink(p, er => {
+      if (er) {
+        if (er.code === 'ENOENT') {
+          return cb(null)
+        }
+        if (er.code === 'EPERM') {
+          return (isWindows)
+            ? fixWinEPERM(p, options, er, cb)
+            : rmdir(p, options, er, cb)
+        }
+        if (er.code === 'EISDIR') {
+          return rmdir(p, options, er, cb)
+        }
+      }
+      return cb(er)
+    })
+  })
+}
+
+function fixWinEPERM (p, options, er, cb) {
+  assert(p)
+  assert(options)
+  assert(typeof cb === 'function')
+  if (er) {
+    assert(er instanceof Error)
+  }
+
+  options.chmod(p, 0o666, er2 => {
+    if (er2) {
+      cb(er2.code === 'ENOENT' ? null : er)
+    } else {
+      options.stat(p, (er3, stats) => {
+        if (er3) {
+          cb(er3.code === 'ENOENT' ? null : er)
+        } else if (stats.isDirectory()) {
+          rmdir(p, options, er, cb)
+        } else {
+          options.unlink(p, cb)
+        }
+      })
+    }
+  })
+}
+
+function fixWinEPERMSync (p, options, er) {
+  let stats
+
+  assert(p)
+  assert(options)
+  if (er) {
+    assert(er instanceof Error)
+  }
+
+  try {
+    options.chmodSync(p, 0o666)
+  } catch (er2) {
+    if (er2.code === 'ENOENT') {
+      return
+    } else {
+      throw er
+    }
+  }
+
+  try {
+    stats = options.statSync(p)
+  } catch (er3) {
+    if (er3.code === 'ENOENT') {
+      return
+    } else {
+      throw er
+    }
+  }
+
+  if (stats.isDirectory()) {
+    rmdirSync(p, options, er)
+  } else {
+    options.unlinkSync(p)
+  }
+}
+
+function rmdir (p, options, originalEr, cb) {
+  assert(p)
+  assert(options)
+  if (originalEr) {
+    assert(originalEr instanceof Error)
+  }
+  assert(typeof cb === 'function')
+
+  // try to rmdir first, and only readdir on ENOTEMPTY or EEXIST (SunOS)
+  // if we guessed wrong, and it's not a directory, then
+  // raise the original error.
+  options.rmdir(p, er => {
+    if (er && (er.code === 'ENOTEMPTY' || er.code === 'EEXIST' || er.code === 'EPERM')) {
+      rmkids(p, options, cb)
+    } else if (er && er.code === 'ENOTDIR') {
+      cb(originalEr)
+    } else {
+      cb(er)
+    }
+  })
+}
+
+function rmkids (p, options, cb) {
+  assert(p)
+  assert(options)
+  assert(typeof cb === 'function')
+
+  options.readdir(p, (er, files) => {
+    if (er) return cb(er)
+
+    let n = files.length
+    let errState
+
+    if (n === 0) return options.rmdir(p, cb)
+
+    files.forEach(f => {
+      rimraf(path.join(p, f), options, er => {
+        if (errState) {
+          return
+        }
+        if (er) return cb(errState = er)
+        if (--n === 0) {
+          options.rmdir(p, cb)
+        }
+      })
+    })
+  })
+}
+
+// this looks simpler, and is strictly *faster*, but will
+// tie up the JavaScript thread and fail on excessively
+// deep directory trees.
+function rimrafSync (p, options) {
+  let st
+
+  options = options || {}
+  defaults(options)
+
+  assert(p, 'rimraf: missing path')
+  assert.equal(typeof p, 'string', 'rimraf: path should be a string')
+  assert(options, 'rimraf: missing options')
+  assert.equal(typeof options, 'object', 'rimraf: options should be object')
+
+  try {
+    st = options.lstatSync(p)
+  } catch (er) {
+    if (er.code === 'ENOENT') {
+      return
+    }
+
+    // Windows can EPERM on stat.  Life is suffering.
+    if (er.code === 'EPERM' && isWindows) {
+      fixWinEPERMSync(p, options, er)
+    }
+  }
+
+  try {
+    // sunos lets the root user unlink directories, which is... weird.
+    if (st && st.isDirectory()) {
+      rmdirSync(p, options, null)
+    } else {
+      options.unlinkSync(p)
+    }
+  } catch (er) {
+    if (er.code === 'ENOENT') {
+      return
+    } else if (er.code === 'EPERM') {
+      return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er)
+    } else if (er.code !== 'EISDIR') {
+      throw er
+    }
+    rmdirSync(p, options, er)
+  }
+}
+
+function rmdirSync (p, options, originalEr) {
+  assert(p)
+  assert(options)
+  if (originalEr) {
+    assert(originalEr instanceof Error)
+  }
+
+  try {
+    options.rmdirSync(p)
+  } catch (er) {
+    if (er.code === 'ENOTDIR') {
+      throw originalEr
+    } else if (er.code === 'ENOTEMPTY' || er.code === 'EEXIST' || er.code === 'EPERM') {
+      rmkidsSync(p, options)
+    } else if (er.code !== 'ENOENT') {
+      throw er
+    }
+  }
+}
+
+function rmkidsSync (p, options) {
+  assert(p)
+  assert(options)
+  options.readdirSync(p).forEach(f => rimrafSync(path.join(p, f), options))
+
+  // We only end up here once we got ENOTEMPTY at least once, and
+  // at this point, we are guaranteed to have removed all the kids.
+  // So, we know that it won't be ENOENT or ENOTDIR or anything else.
+  // try really hard to delete stuff on windows, because it has a
+  // PROFOUNDLY annoying habit of not closing handles promptly when
+  // files are deleted, resulting in spurious ENOTEMPTY errors.
+  const retries = isWindows ? 100 : 1
+  let i = 0
+  do {
+    let threw = true
+    try {
+      const ret = options.rmdirSync(p, options)
+      threw = false
+      return ret
+    } finally {
+      if (++i < retries && threw) continue // eslint-disable-line
+    }
+  } while (true)
+}
+
+module.exports = rimraf
+rimraf.sync = rimrafSync
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/assign.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// simple mutable assign
+function assign () {
+  const args = [].slice.call(arguments).filter(i => i)
+  const dest = args.shift()
+  args.forEach(src => {
+    Object.keys(src).forEach(key => {
+      dest[key] = src[key]
+    })
+  })
+
+  return dest
+}
+
+module.exports = assign
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/buffer.js":
+/***/ (function(module, exports) {
+
+/* eslint-disable node/no-deprecated-api */
+module.exports = function (size) {
+  if (typeof Buffer.allocUnsafe === 'function') {
+    try {
+      return Buffer.allocUnsafe(size)
+    } catch (e) {
+      return new Buffer(size)
+    }
+  }
+  return new Buffer(size)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_fs-extra@5.0.0@fs-extra/lib/util/utimes.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+const os = __webpack_require__("os")
+const path = __webpack_require__("path")
+
+// HFS, ext{2,3}, FAT do not, Node.js v0.10 does not
+function hasMillisResSync () {
+  let tmpfile = path.join('millis-test-sync' + Date.now().toString() + Math.random().toString().slice(2))
+  tmpfile = path.join(os.tmpdir(), tmpfile)
+
+  // 550 millis past UNIX epoch
+  const d = new Date(1435410243862)
+  fs.writeFileSync(tmpfile, 'https://github.com/jprichardson/node-fs-extra/pull/141')
+  const fd = fs.openSync(tmpfile, 'r+')
+  fs.futimesSync(fd, d, d)
+  fs.closeSync(fd)
+  return fs.statSync(tmpfile).mtime > 1435410243000
+}
+
+function hasMillisRes (callback) {
+  let tmpfile = path.join('millis-test' + Date.now().toString() + Math.random().toString().slice(2))
+  tmpfile = path.join(os.tmpdir(), tmpfile)
+
+  // 550 millis past UNIX epoch
+  const d = new Date(1435410243862)
+  fs.writeFile(tmpfile, 'https://github.com/jprichardson/node-fs-extra/pull/141', err => {
+    if (err) return callback(err)
+    fs.open(tmpfile, 'r+', (err, fd) => {
+      if (err) return callback(err)
+      fs.futimes(fd, d, d, err => {
+        if (err) return callback(err)
+        fs.close(fd, err => {
+          if (err) return callback(err)
+          fs.stat(tmpfile, (err, stats) => {
+            if (err) return callback(err)
+            callback(null, stats.mtime > 1435410243000)
+          })
+        })
+      })
+    })
+  })
+}
+
+function timeRemoveMillis (timestamp) {
+  if (typeof timestamp === 'number') {
+    return Math.floor(timestamp / 1000) * 1000
+  } else if (timestamp instanceof Date) {
+    return new Date(Math.floor(timestamp.getTime() / 1000) * 1000)
+  } else {
+    throw new Error('fs-extra: timeRemoveMillis() unknown parameter type')
+  }
+}
+
+function utimesMillis (path, atime, mtime, callback) {
+  // if (!HAS_MILLIS_RES) return fs.utimes(path, atime, mtime, callback)
+  fs.open(path, 'r+', (err, fd) => {
+    if (err) return callback(err)
+    fs.futimes(fd, atime, mtime, futimesErr => {
+      fs.close(fd, closeErr => {
+        if (callback) callback(futimesErr || closeErr)
+      })
+    })
+  })
+}
+
+function utimesMillisSync (path, atime, mtime) {
+  const fd = fs.openSync(path, 'r+')
+  fs.futimesSync(fd, atime, mtime)
+  return fs.closeSync(fd)
+}
+
+module.exports = {
+  hasMillisRes,
+  hasMillisResSync,
+  timeRemoveMillis,
+  utimesMillis,
+  utimesMillisSync
 }
 
 
@@ -1814,6 +4233,766 @@ module.exports = got;
 /***/ (function(module, exports) {
 
 module.exports = {"name":"got","version":"8.3.0","description":"Simplified HTTP requests","license":"MIT","repository":"sindresorhus/got","maintainers":[{"name":"Sindre Sorhus","email":"sindresorhus@gmail.com","url":"sindresorhus.com"},{"name":"Vsevolod Strukchinsky","email":"floatdrop@gmail.com","url":"github.com/floatdrop"},{"name":"Alexander Tesfamichael","email":"alex.tesfamichael@gmail.com","url":"alextes.me"}],"engines":{"node":">=4"},"scripts":{"test":"xo && nyc ava","coveralls":"nyc report --reporter=text-lcov | coveralls"},"files":["index.js","errors.js"],"keywords":["http","https","get","got","url","uri","request","util","utility","simple","curl","wget","fetch","net","network","electron"],"dependencies":{"@sindresorhus/is":"^0.7.0","cacheable-request":"^2.1.1","decompress-response":"^3.3.0","duplexer3":"^0.1.4","get-stream":"^3.0.0","into-stream":"^3.1.0","is-retry-allowed":"^1.1.0","isurl":"^1.0.0-alpha5","lowercase-keys":"^1.0.0","mimic-response":"^1.0.0","p-cancelable":"^0.4.0","p-timeout":"^2.0.1","pify":"^3.0.0","safe-buffer":"^5.1.1","timed-out":"^4.0.1","url-parse-lax":"^3.0.0","url-to-options":"^1.0.1"},"devDependencies":{"ava":"^0.25.0","coveralls":"^3.0.0","form-data":"^2.1.1","get-port":"^3.0.0","nyc":"^11.0.2","p-event":"^1.3.0","pem":"^1.4.4","proxyquire":"^1.8.0","sinon":"^4.0.0","slow-stream":"0.0.4","tempfile":"^2.0.0","tempy":"^0.2.1","universal-url":"1.0.0-alpha","xo":"^0.20.0"},"ava":{"concurrency":4},"browser":{"decompress-response":false,"electron":false},"_from":"got@8.3.0","_resolved":"http://registry.npm.taobao.org/got/download/got-8.3.0.tgz"}
+
+/***/ }),
+
+/***/ "./node_modules/_graceful-fs@4.1.11@graceful-fs/fs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var fs = __webpack_require__("fs")
+
+module.exports = clone(fs)
+
+function clone (obj) {
+  if (obj === null || typeof obj !== 'object')
+    return obj
+
+  if (obj instanceof Object)
+    var copy = { __proto__: obj.__proto__ }
+  else
+    var copy = Object.create(null)
+
+  Object.getOwnPropertyNames(obj).forEach(function (key) {
+    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
+  })
+
+  return copy
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+var fs = __webpack_require__("fs")
+var polyfills = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/polyfills.js")
+var legacy = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/legacy-streams.js")
+var queue = []
+
+var util = __webpack_require__("util")
+
+function noop () {}
+
+var debug = noop
+if (util.debuglog)
+  debug = util.debuglog('gfs4')
+else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || ''))
+  debug = function() {
+    var m = util.format.apply(util, arguments)
+    m = 'GFS4: ' + m.split(/\n/).join('\nGFS4: ')
+    console.error(m)
+  }
+
+if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
+  process.on('exit', function() {
+    debug(queue)
+    __webpack_require__("assert").equal(queue.length, 0)
+  })
+}
+
+module.exports = patch(__webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/fs.js"))
+if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH) {
+  module.exports = patch(fs)
+}
+
+// Always patch fs.close/closeSync, because we want to
+// retry() whenever a close happens *anywhere* in the program.
+// This is essential when multiple graceful-fs instances are
+// in play at the same time.
+module.exports.close =
+fs.close = (function (fs$close) { return function (fd, cb) {
+  return fs$close.call(fs, fd, function (err) {
+    if (!err)
+      retry()
+
+    if (typeof cb === 'function')
+      cb.apply(this, arguments)
+  })
+}})(fs.close)
+
+module.exports.closeSync =
+fs.closeSync = (function (fs$closeSync) { return function (fd) {
+  // Note that graceful-fs also retries when fs.closeSync() fails.
+  // Looks like a bug to me, although it's probably a harmless one.
+  var rval = fs$closeSync.apply(fs, arguments)
+  retry()
+  return rval
+}})(fs.closeSync)
+
+function patch (fs) {
+  // Everything that references the open() function needs to be in here
+  polyfills(fs)
+  fs.gracefulify = patch
+  fs.FileReadStream = ReadStream;  // Legacy name.
+  fs.FileWriteStream = WriteStream;  // Legacy name.
+  fs.createReadStream = createReadStream
+  fs.createWriteStream = createWriteStream
+  var fs$readFile = fs.readFile
+  fs.readFile = readFile
+  function readFile (path, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$readFile(path, options, cb)
+
+    function go$readFile (path, options, cb) {
+      return fs$readFile(path, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$readFile, [path, options, cb]])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+          retry()
+        }
+      })
+    }
+  }
+
+  var fs$writeFile = fs.writeFile
+  fs.writeFile = writeFile
+  function writeFile (path, data, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$writeFile(path, data, options, cb)
+
+    function go$writeFile (path, data, options, cb) {
+      return fs$writeFile(path, data, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$writeFile, [path, data, options, cb]])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+          retry()
+        }
+      })
+    }
+  }
+
+  var fs$appendFile = fs.appendFile
+  if (fs$appendFile)
+    fs.appendFile = appendFile
+  function appendFile (path, data, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$appendFile(path, data, options, cb)
+
+    function go$appendFile (path, data, options, cb) {
+      return fs$appendFile(path, data, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$appendFile, [path, data, options, cb]])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+          retry()
+        }
+      })
+    }
+  }
+
+  var fs$readdir = fs.readdir
+  fs.readdir = readdir
+  function readdir (path, options, cb) {
+    var args = [path]
+    if (typeof options !== 'function') {
+      args.push(options)
+    } else {
+      cb = options
+    }
+    args.push(go$readdir$cb)
+
+    return go$readdir(args)
+
+    function go$readdir$cb (err, files) {
+      if (files && files.sort)
+        files.sort()
+
+      if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+        enqueue([go$readdir, [args]])
+      else {
+        if (typeof cb === 'function')
+          cb.apply(this, arguments)
+        retry()
+      }
+    }
+  }
+
+  function go$readdir (args) {
+    return fs$readdir.apply(fs, args)
+  }
+
+  if (process.version.substr(0, 4) === 'v0.8') {
+    var legStreams = legacy(fs)
+    ReadStream = legStreams.ReadStream
+    WriteStream = legStreams.WriteStream
+  }
+
+  var fs$ReadStream = fs.ReadStream
+  ReadStream.prototype = Object.create(fs$ReadStream.prototype)
+  ReadStream.prototype.open = ReadStream$open
+
+  var fs$WriteStream = fs.WriteStream
+  WriteStream.prototype = Object.create(fs$WriteStream.prototype)
+  WriteStream.prototype.open = WriteStream$open
+
+  fs.ReadStream = ReadStream
+  fs.WriteStream = WriteStream
+
+  function ReadStream (path, options) {
+    if (this instanceof ReadStream)
+      return fs$ReadStream.apply(this, arguments), this
+    else
+      return ReadStream.apply(Object.create(ReadStream.prototype), arguments)
+  }
+
+  function ReadStream$open () {
+    var that = this
+    open(that.path, that.flags, that.mode, function (err, fd) {
+      if (err) {
+        if (that.autoClose)
+          that.destroy()
+
+        that.emit('error', err)
+      } else {
+        that.fd = fd
+        that.emit('open', fd)
+        that.read()
+      }
+    })
+  }
+
+  function WriteStream (path, options) {
+    if (this instanceof WriteStream)
+      return fs$WriteStream.apply(this, arguments), this
+    else
+      return WriteStream.apply(Object.create(WriteStream.prototype), arguments)
+  }
+
+  function WriteStream$open () {
+    var that = this
+    open(that.path, that.flags, that.mode, function (err, fd) {
+      if (err) {
+        that.destroy()
+        that.emit('error', err)
+      } else {
+        that.fd = fd
+        that.emit('open', fd)
+      }
+    })
+  }
+
+  function createReadStream (path, options) {
+    return new ReadStream(path, options)
+  }
+
+  function createWriteStream (path, options) {
+    return new WriteStream(path, options)
+  }
+
+  var fs$open = fs.open
+  fs.open = open
+  function open (path, flags, mode, cb) {
+    if (typeof mode === 'function')
+      cb = mode, mode = null
+
+    return go$open(path, flags, mode, cb)
+
+    function go$open (path, flags, mode, cb) {
+      return fs$open(path, flags, mode, function (err, fd) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$open, [path, flags, mode, cb]])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+          retry()
+        }
+      })
+    }
+  }
+
+  return fs
+}
+
+function enqueue (elem) {
+  debug('ENQUEUE', elem[0].name, elem[1])
+  queue.push(elem)
+}
+
+function retry () {
+  var elem = queue.shift()
+  if (elem) {
+    debug('RETRY', elem[0].name, elem[1])
+    elem[0].apply(null, elem[1])
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_graceful-fs@4.1.11@graceful-fs/legacy-streams.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+var Stream = __webpack_require__("stream").Stream
+
+module.exports = legacy
+
+function legacy (fs) {
+  return {
+    ReadStream: ReadStream,
+    WriteStream: WriteStream
+  }
+
+  function ReadStream (path, options) {
+    if (!(this instanceof ReadStream)) return new ReadStream(path, options);
+
+    Stream.call(this);
+
+    var self = this;
+
+    this.path = path;
+    this.fd = null;
+    this.readable = true;
+    this.paused = false;
+
+    this.flags = 'r';
+    this.mode = 438; /*=0666*/
+    this.bufferSize = 64 * 1024;
+
+    options = options || {};
+
+    // Mixin options into this
+    var keys = Object.keys(options);
+    for (var index = 0, length = keys.length; index < length; index++) {
+      var key = keys[index];
+      this[key] = options[key];
+    }
+
+    if (this.encoding) this.setEncoding(this.encoding);
+
+    if (this.start !== undefined) {
+      if ('number' !== typeof this.start) {
+        throw TypeError('start must be a Number');
+      }
+      if (this.end === undefined) {
+        this.end = Infinity;
+      } else if ('number' !== typeof this.end) {
+        throw TypeError('end must be a Number');
+      }
+
+      if (this.start > this.end) {
+        throw new Error('start must be <= end');
+      }
+
+      this.pos = this.start;
+    }
+
+    if (this.fd !== null) {
+      process.nextTick(function() {
+        self._read();
+      });
+      return;
+    }
+
+    fs.open(this.path, this.flags, this.mode, function (err, fd) {
+      if (err) {
+        self.emit('error', err);
+        self.readable = false;
+        return;
+      }
+
+      self.fd = fd;
+      self.emit('open', fd);
+      self._read();
+    })
+  }
+
+  function WriteStream (path, options) {
+    if (!(this instanceof WriteStream)) return new WriteStream(path, options);
+
+    Stream.call(this);
+
+    this.path = path;
+    this.fd = null;
+    this.writable = true;
+
+    this.flags = 'w';
+    this.encoding = 'binary';
+    this.mode = 438; /*=0666*/
+    this.bytesWritten = 0;
+
+    options = options || {};
+
+    // Mixin options into this
+    var keys = Object.keys(options);
+    for (var index = 0, length = keys.length; index < length; index++) {
+      var key = keys[index];
+      this[key] = options[key];
+    }
+
+    if (this.start !== undefined) {
+      if ('number' !== typeof this.start) {
+        throw TypeError('start must be a Number');
+      }
+      if (this.start < 0) {
+        throw new Error('start must be >= zero');
+      }
+
+      this.pos = this.start;
+    }
+
+    this.busy = false;
+    this._queue = [];
+
+    if (this.fd === null) {
+      this._open = fs.open;
+      this._queue.push([this._open, this.path, this.flags, this.mode, undefined]);
+      this.flush();
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/_graceful-fs@4.1.11@graceful-fs/polyfills.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+var fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/fs.js")
+var constants = __webpack_require__("constants")
+
+var origCwd = process.cwd
+var cwd = null
+
+var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform
+
+process.cwd = function() {
+  if (!cwd)
+    cwd = origCwd.call(process)
+  return cwd
+}
+try {
+  process.cwd()
+} catch (er) {}
+
+var chdir = process.chdir
+process.chdir = function(d) {
+  cwd = null
+  chdir.call(process, d)
+}
+
+module.exports = patch
+
+function patch (fs) {
+  // (re-)implement some things that are known busted or missing.
+
+  // lchmod, broken prior to 0.6.2
+  // back-port the fix here.
+  if (constants.hasOwnProperty('O_SYMLINK') &&
+      process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
+    patchLchmod(fs)
+  }
+
+  // lutimes implementation, or no-op
+  if (!fs.lutimes) {
+    patchLutimes(fs)
+  }
+
+  // https://github.com/isaacs/node-graceful-fs/issues/4
+  // Chown should not fail on einval or eperm if non-root.
+  // It should not fail on enosys ever, as this just indicates
+  // that a fs doesn't support the intended operation.
+
+  fs.chown = chownFix(fs.chown)
+  fs.fchown = chownFix(fs.fchown)
+  fs.lchown = chownFix(fs.lchown)
+
+  fs.chmod = chmodFix(fs.chmod)
+  fs.fchmod = chmodFix(fs.fchmod)
+  fs.lchmod = chmodFix(fs.lchmod)
+
+  fs.chownSync = chownFixSync(fs.chownSync)
+  fs.fchownSync = chownFixSync(fs.fchownSync)
+  fs.lchownSync = chownFixSync(fs.lchownSync)
+
+  fs.chmodSync = chmodFixSync(fs.chmodSync)
+  fs.fchmodSync = chmodFixSync(fs.fchmodSync)
+  fs.lchmodSync = chmodFixSync(fs.lchmodSync)
+
+  fs.stat = statFix(fs.stat)
+  fs.fstat = statFix(fs.fstat)
+  fs.lstat = statFix(fs.lstat)
+
+  fs.statSync = statFixSync(fs.statSync)
+  fs.fstatSync = statFixSync(fs.fstatSync)
+  fs.lstatSync = statFixSync(fs.lstatSync)
+
+  // if lchmod/lchown do not exist, then make them no-ops
+  if (!fs.lchmod) {
+    fs.lchmod = function (path, mode, cb) {
+      if (cb) process.nextTick(cb)
+    }
+    fs.lchmodSync = function () {}
+  }
+  if (!fs.lchown) {
+    fs.lchown = function (path, uid, gid, cb) {
+      if (cb) process.nextTick(cb)
+    }
+    fs.lchownSync = function () {}
+  }
+
+  // on Windows, A/V software can lock the directory, causing this
+  // to fail with an EACCES or EPERM if the directory contains newly
+  // created files.  Try again on failure, for up to 60 seconds.
+
+  // Set the timeout this long because some Windows Anti-Virus, such as Parity
+  // bit9, may lock files for up to a minute, causing npm package install
+  // failures. Also, take care to yield the scheduler. Windows scheduling gives
+  // CPU to a busy looping process, which can cause the program causing the lock
+  // contention to be starved of CPU by node, so the contention doesn't resolve.
+  if (platform === "win32") {
+    fs.rename = (function (fs$rename) { return function (from, to, cb) {
+      var start = Date.now()
+      var backoff = 0;
+      fs$rename(from, to, function CB (er) {
+        if (er
+            && (er.code === "EACCES" || er.code === "EPERM")
+            && Date.now() - start < 60000) {
+          setTimeout(function() {
+            fs.stat(to, function (stater, st) {
+              if (stater && stater.code === "ENOENT")
+                fs$rename(from, to, CB);
+              else
+                cb(er)
+            })
+          }, backoff)
+          if (backoff < 100)
+            backoff += 10;
+          return;
+        }
+        if (cb) cb(er)
+      })
+    }})(fs.rename)
+  }
+
+  // if read() returns EAGAIN, then just try it again.
+  fs.read = (function (fs$read) { return function (fd, buffer, offset, length, position, callback_) {
+    var callback
+    if (callback_ && typeof callback_ === 'function') {
+      var eagCounter = 0
+      callback = function (er, _, __) {
+        if (er && er.code === 'EAGAIN' && eagCounter < 10) {
+          eagCounter ++
+          return fs$read.call(fs, fd, buffer, offset, length, position, callback)
+        }
+        callback_.apply(this, arguments)
+      }
+    }
+    return fs$read.call(fs, fd, buffer, offset, length, position, callback)
+  }})(fs.read)
+
+  fs.readSync = (function (fs$readSync) { return function (fd, buffer, offset, length, position) {
+    var eagCounter = 0
+    while (true) {
+      try {
+        return fs$readSync.call(fs, fd, buffer, offset, length, position)
+      } catch (er) {
+        if (er.code === 'EAGAIN' && eagCounter < 10) {
+          eagCounter ++
+          continue
+        }
+        throw er
+      }
+    }
+  }})(fs.readSync)
+}
+
+function patchLchmod (fs) {
+  fs.lchmod = function (path, mode, callback) {
+    fs.open( path
+           , constants.O_WRONLY | constants.O_SYMLINK
+           , mode
+           , function (err, fd) {
+      if (err) {
+        if (callback) callback(err)
+        return
+      }
+      // prefer to return the chmod error, if one occurs,
+      // but still try to close, and report closing errors if they occur.
+      fs.fchmod(fd, mode, function (err) {
+        fs.close(fd, function(err2) {
+          if (callback) callback(err || err2)
+        })
+      })
+    })
+  }
+
+  fs.lchmodSync = function (path, mode) {
+    var fd = fs.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode)
+
+    // prefer to return the chmod error, if one occurs,
+    // but still try to close, and report closing errors if they occur.
+    var threw = true
+    var ret
+    try {
+      ret = fs.fchmodSync(fd, mode)
+      threw = false
+    } finally {
+      if (threw) {
+        try {
+          fs.closeSync(fd)
+        } catch (er) {}
+      } else {
+        fs.closeSync(fd)
+      }
+    }
+    return ret
+  }
+}
+
+function patchLutimes (fs) {
+  if (constants.hasOwnProperty("O_SYMLINK")) {
+    fs.lutimes = function (path, at, mt, cb) {
+      fs.open(path, constants.O_SYMLINK, function (er, fd) {
+        if (er) {
+          if (cb) cb(er)
+          return
+        }
+        fs.futimes(fd, at, mt, function (er) {
+          fs.close(fd, function (er2) {
+            if (cb) cb(er || er2)
+          })
+        })
+      })
+    }
+
+    fs.lutimesSync = function (path, at, mt) {
+      var fd = fs.openSync(path, constants.O_SYMLINK)
+      var ret
+      var threw = true
+      try {
+        ret = fs.futimesSync(fd, at, mt)
+        threw = false
+      } finally {
+        if (threw) {
+          try {
+            fs.closeSync(fd)
+          } catch (er) {}
+        } else {
+          fs.closeSync(fd)
+        }
+      }
+      return ret
+    }
+
+  } else {
+    fs.lutimes = function (_a, _b, _c, cb) { if (cb) process.nextTick(cb) }
+    fs.lutimesSync = function () {}
+  }
+}
+
+function chmodFix (orig) {
+  if (!orig) return orig
+  return function (target, mode, cb) {
+    return orig.call(fs, target, mode, function (er) {
+      if (chownErOk(er)) er = null
+      if (cb) cb.apply(this, arguments)
+    })
+  }
+}
+
+function chmodFixSync (orig) {
+  if (!orig) return orig
+  return function (target, mode) {
+    try {
+      return orig.call(fs, target, mode)
+    } catch (er) {
+      if (!chownErOk(er)) throw er
+    }
+  }
+}
+
+
+function chownFix (orig) {
+  if (!orig) return orig
+  return function (target, uid, gid, cb) {
+    return orig.call(fs, target, uid, gid, function (er) {
+      if (chownErOk(er)) er = null
+      if (cb) cb.apply(this, arguments)
+    })
+  }
+}
+
+function chownFixSync (orig) {
+  if (!orig) return orig
+  return function (target, uid, gid) {
+    try {
+      return orig.call(fs, target, uid, gid)
+    } catch (er) {
+      if (!chownErOk(er)) throw er
+    }
+  }
+}
+
+
+function statFix (orig) {
+  if (!orig) return orig
+  // Older versions of Node erroneously returned signed integers for
+  // uid + gid.
+  return function (target, cb) {
+    return orig.call(fs, target, function (er, stats) {
+      if (!stats) return cb.apply(this, arguments)
+      if (stats.uid < 0) stats.uid += 0x100000000
+      if (stats.gid < 0) stats.gid += 0x100000000
+      if (cb) cb.apply(this, arguments)
+    })
+  }
+}
+
+function statFixSync (orig) {
+  if (!orig) return orig
+  // Older versions of Node erroneously returned signed integers for
+  // uid + gid.
+  return function (target) {
+    var stats = orig.call(fs, target)
+    if (stats.uid < 0) stats.uid += 0x100000000
+    if (stats.gid < 0) stats.gid += 0x100000000
+    return stats;
+  }
+}
+
+// ENOSYS means that the fs doesn't support the op. Just ignore
+// that, because it doesn't matter.
+//
+// if there's no getuid, or if getuid() is something other
+// than 0, and the error is EINVAL or EPERM, then just ignore
+// it.
+//
+// This specific case is a silent failure in cp, install, tar,
+// and most other unix tools that manage permissions.
+//
+// When running as root, or if other types of errors are
+// encountered, then it's strict.
+function chownErOk (er) {
+  if (!er)
+    return true
+
+  if (er.code === "ENOSYS")
+    return true
+
+  var nonroot = !process.getuid || process.getuid() !== 0
+  if (nonroot) {
+    if (er.code === "EINVAL" || er.code === "EPERM")
+      return true
+  }
+
+  return false
+}
+
 
 /***/ }),
 
@@ -2802,6 +5981,147 @@ exports.parse = function (s) {
     return value
   })
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/_jsonfile@4.0.0@jsonfile/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+var _fs
+try {
+  _fs = __webpack_require__("./node_modules/_graceful-fs@4.1.11@graceful-fs/graceful-fs.js")
+} catch (_) {
+  _fs = __webpack_require__("fs")
+}
+
+function readFile (file, options, callback) {
+  if (callback == null) {
+    callback = options
+    options = {}
+  }
+
+  if (typeof options === 'string') {
+    options = {encoding: options}
+  }
+
+  options = options || {}
+  var fs = options.fs || _fs
+
+  var shouldThrow = true
+  if ('throws' in options) {
+    shouldThrow = options.throws
+  }
+
+  fs.readFile(file, options, function (err, data) {
+    if (err) return callback(err)
+
+    data = stripBom(data)
+
+    var obj
+    try {
+      obj = JSON.parse(data, options ? options.reviver : null)
+    } catch (err2) {
+      if (shouldThrow) {
+        err2.message = file + ': ' + err2.message
+        return callback(err2)
+      } else {
+        return callback(null, null)
+      }
+    }
+
+    callback(null, obj)
+  })
+}
+
+function readFileSync (file, options) {
+  options = options || {}
+  if (typeof options === 'string') {
+    options = {encoding: options}
+  }
+
+  var fs = options.fs || _fs
+
+  var shouldThrow = true
+  if ('throws' in options) {
+    shouldThrow = options.throws
+  }
+
+  try {
+    var content = fs.readFileSync(file, options)
+    content = stripBom(content)
+    return JSON.parse(content, options.reviver)
+  } catch (err) {
+    if (shouldThrow) {
+      err.message = file + ': ' + err.message
+      throw err
+    } else {
+      return null
+    }
+  }
+}
+
+function stringify (obj, options) {
+  var spaces
+  var EOL = '\n'
+  if (typeof options === 'object' && options !== null) {
+    if (options.spaces) {
+      spaces = options.spaces
+    }
+    if (options.EOL) {
+      EOL = options.EOL
+    }
+  }
+
+  var str = JSON.stringify(obj, options ? options.replacer : null, spaces)
+
+  return str.replace(/\n/g, EOL) + EOL
+}
+
+function writeFile (file, obj, options, callback) {
+  if (callback == null) {
+    callback = options
+    options = {}
+  }
+  options = options || {}
+  var fs = options.fs || _fs
+
+  var str = ''
+  try {
+    str = stringify(obj, options)
+  } catch (err) {
+    // Need to return whether a callback was passed or not
+    if (callback) callback(err, null)
+    return
+  }
+
+  fs.writeFile(file, str, options, callback)
+}
+
+function writeFileSync (file, obj, options) {
+  options = options || {}
+  var fs = options.fs || _fs
+
+  var str = stringify(obj, options)
+  // not sure if fs.writeFileSync returns anything, but just in case
+  return fs.writeFileSync(file, str, options)
+}
+
+function stripBom (content) {
+  // we do this because JSON.parse would convert it to a utf8 string if encoding wasn't specified
+  if (Buffer.isBuffer(content)) content = content.toString('utf8')
+  content = content.replace(/^\uFEFF/, '')
+  return content
+}
+
+var jsonfile = {
+  readFile: readFile,
+  readFileSync: readFileSync,
+  writeFile: writeFile,
+  writeFileSync: writeFileSync
+}
+
+module.exports = jsonfile
 
 
 /***/ }),
@@ -6307,3839 +9627,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 /***/ }),
 
-/***/ "./node_modules/_sort-keys@2.0.0@sort-keys/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-const isPlainObj = __webpack_require__("./node_modules/_is-plain-obj@1.1.0@is-plain-obj/index.js");
-
-module.exports = (obj, opts) => {
-	if (!isPlainObj(obj)) {
-		throw new TypeError('Expected a plain object');
-	}
-
-	opts = opts || {};
-
-	// DEPRECATED
-	if (typeof opts === 'function') {
-		throw new TypeError('Specify the compare function as an option instead');
-	}
-
-	const deep = opts.deep;
-	const seenInput = [];
-	const seenOutput = [];
-
-	const sortKeys = x => {
-		const seenIndex = seenInput.indexOf(x);
-
-		if (seenIndex !== -1) {
-			return seenOutput[seenIndex];
-		}
-
-		const ret = {};
-		const keys = Object.keys(x).sort(opts.compare);
-
-		seenInput.push(x);
-		seenOutput.push(ret);
-
-		for (let i = 0; i < keys.length; i++) {
-			const key = keys[i];
-			const val = x[key];
-
-			if (deep && Array.isArray(val)) {
-				const retArr = [];
-
-				for (let j = 0; j < val.length; j++) {
-					retArr[j] = isPlainObj(val[j]) ? sortKeys(val[j]) : val[j];
-				}
-
-				ret[key] = retArr;
-				continue;
-			}
-
-			ret[key] = deep && isPlainObj(val) ? sortKeys(val) : val;
-		}
-
-		return ret;
-	};
-
-	return sortKeys(obj);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/_strict-uri-encode@1.1.0@strict-uri-encode/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function (str) {
-	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
-		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
-	});
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/_string_decoder@1.1.1@string_decoder/lib/string_decoder.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-
-/*<replacement>*/
-
-var Buffer = __webpack_require__("./node_modules/_safe-buffer@5.1.1@safe-buffer/index.js").Buffer;
-/*</replacement>*/
-
-var isEncoding = Buffer.isEncoding || function (encoding) {
-  encoding = '' + encoding;
-  switch (encoding && encoding.toLowerCase()) {
-    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
-      return true;
-    default:
-      return false;
-  }
-};
-
-function _normalizeEncoding(enc) {
-  if (!enc) return 'utf8';
-  var retried;
-  while (true) {
-    switch (enc) {
-      case 'utf8':
-      case 'utf-8':
-        return 'utf8';
-      case 'ucs2':
-      case 'ucs-2':
-      case 'utf16le':
-      case 'utf-16le':
-        return 'utf16le';
-      case 'latin1':
-      case 'binary':
-        return 'latin1';
-      case 'base64':
-      case 'ascii':
-      case 'hex':
-        return enc;
-      default:
-        if (retried) return; // undefined
-        enc = ('' + enc).toLowerCase();
-        retried = true;
-    }
-  }
-};
-
-// Do not cache `Buffer.isEncoding` when checking encoding names as some
-// modules monkey-patch it to support additional encodings
-function normalizeEncoding(enc) {
-  var nenc = _normalizeEncoding(enc);
-  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
-  return nenc || enc;
-}
-
-// StringDecoder provides an interface for efficiently splitting a series of
-// buffers into a series of JS strings without breaking apart multi-byte
-// characters.
-exports.StringDecoder = StringDecoder;
-function StringDecoder(encoding) {
-  this.encoding = normalizeEncoding(encoding);
-  var nb;
-  switch (this.encoding) {
-    case 'utf16le':
-      this.text = utf16Text;
-      this.end = utf16End;
-      nb = 4;
-      break;
-    case 'utf8':
-      this.fillLast = utf8FillLast;
-      nb = 4;
-      break;
-    case 'base64':
-      this.text = base64Text;
-      this.end = base64End;
-      nb = 3;
-      break;
-    default:
-      this.write = simpleWrite;
-      this.end = simpleEnd;
-      return;
-  }
-  this.lastNeed = 0;
-  this.lastTotal = 0;
-  this.lastChar = Buffer.allocUnsafe(nb);
-}
-
-StringDecoder.prototype.write = function (buf) {
-  if (buf.length === 0) return '';
-  var r;
-  var i;
-  if (this.lastNeed) {
-    r = this.fillLast(buf);
-    if (r === undefined) return '';
-    i = this.lastNeed;
-    this.lastNeed = 0;
-  } else {
-    i = 0;
-  }
-  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
-  return r || '';
-};
-
-StringDecoder.prototype.end = utf8End;
-
-// Returns only complete characters in a Buffer
-StringDecoder.prototype.text = utf8Text;
-
-// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
-StringDecoder.prototype.fillLast = function (buf) {
-  if (this.lastNeed <= buf.length) {
-    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
-    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
-  }
-  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
-  this.lastNeed -= buf.length;
-};
-
-// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
-// continuation byte. If an invalid byte is detected, -2 is returned.
-function utf8CheckByte(byte) {
-  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
-  return byte >> 6 === 0x02 ? -1 : -2;
-}
-
-// Checks at most 3 bytes at the end of a Buffer in order to detect an
-// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
-// needed to complete the UTF-8 character (if applicable) are returned.
-function utf8CheckIncomplete(self, buf, i) {
-  var j = buf.length - 1;
-  if (j < i) return 0;
-  var nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) self.lastNeed = nb - 1;
-    return nb;
-  }
-  if (--j < i || nb === -2) return 0;
-  nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) self.lastNeed = nb - 2;
-    return nb;
-  }
-  if (--j < i || nb === -2) return 0;
-  nb = utf8CheckByte(buf[j]);
-  if (nb >= 0) {
-    if (nb > 0) {
-      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
-    }
-    return nb;
-  }
-  return 0;
-}
-
-// Validates as many continuation bytes for a multi-byte UTF-8 character as
-// needed or are available. If we see a non-continuation byte where we expect
-// one, we "replace" the validated continuation bytes we've seen so far with
-// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
-// behavior. The continuation byte check is included three times in the case
-// where all of the continuation bytes for a character exist in the same buffer.
-// It is also done this way as a slight performance increase instead of using a
-// loop.
-function utf8CheckExtraBytes(self, buf, p) {
-  if ((buf[0] & 0xC0) !== 0x80) {
-    self.lastNeed = 0;
-    return '\ufffd';
-  }
-  if (self.lastNeed > 1 && buf.length > 1) {
-    if ((buf[1] & 0xC0) !== 0x80) {
-      self.lastNeed = 1;
-      return '\ufffd';
-    }
-    if (self.lastNeed > 2 && buf.length > 2) {
-      if ((buf[2] & 0xC0) !== 0x80) {
-        self.lastNeed = 2;
-        return '\ufffd';
-      }
-    }
-  }
-}
-
-// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
-function utf8FillLast(buf) {
-  var p = this.lastTotal - this.lastNeed;
-  var r = utf8CheckExtraBytes(this, buf, p);
-  if (r !== undefined) return r;
-  if (this.lastNeed <= buf.length) {
-    buf.copy(this.lastChar, p, 0, this.lastNeed);
-    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
-  }
-  buf.copy(this.lastChar, p, 0, buf.length);
-  this.lastNeed -= buf.length;
-}
-
-// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
-// partial character, the character's bytes are buffered until the required
-// number of bytes are available.
-function utf8Text(buf, i) {
-  var total = utf8CheckIncomplete(this, buf, i);
-  if (!this.lastNeed) return buf.toString('utf8', i);
-  this.lastTotal = total;
-  var end = buf.length - (total - this.lastNeed);
-  buf.copy(this.lastChar, 0, end);
-  return buf.toString('utf8', i, end);
-}
-
-// For UTF-8, a replacement character is added when ending on a partial
-// character.
-function utf8End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + '\ufffd';
-  return r;
-}
-
-// UTF-16LE typically needs two bytes per character, but even if we have an even
-// number of bytes available, we need to check if we end on a leading/high
-// surrogate. In that case, we need to wait for the next two bytes in order to
-// decode the last character properly.
-function utf16Text(buf, i) {
-  if ((buf.length - i) % 2 === 0) {
-    var r = buf.toString('utf16le', i);
-    if (r) {
-      var c = r.charCodeAt(r.length - 1);
-      if (c >= 0xD800 && c <= 0xDBFF) {
-        this.lastNeed = 2;
-        this.lastTotal = 4;
-        this.lastChar[0] = buf[buf.length - 2];
-        this.lastChar[1] = buf[buf.length - 1];
-        return r.slice(0, -1);
-      }
-    }
-    return r;
-  }
-  this.lastNeed = 1;
-  this.lastTotal = 2;
-  this.lastChar[0] = buf[buf.length - 1];
-  return buf.toString('utf16le', i, buf.length - 1);
-}
-
-// For UTF-16LE we do not explicitly append special replacement characters if we
-// end on a partial character, we simply let v8 handle that.
-function utf16End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) {
-    var end = this.lastTotal - this.lastNeed;
-    return r + this.lastChar.toString('utf16le', 0, end);
-  }
-  return r;
-}
-
-function base64Text(buf, i) {
-  var n = (buf.length - i) % 3;
-  if (n === 0) return buf.toString('base64', i);
-  this.lastNeed = 3 - n;
-  this.lastTotal = 3;
-  if (n === 1) {
-    this.lastChar[0] = buf[buf.length - 1];
-  } else {
-    this.lastChar[0] = buf[buf.length - 2];
-    this.lastChar[1] = buf[buf.length - 1];
-  }
-  return buf.toString('base64', i, buf.length - n);
-}
-
-function base64End(buf) {
-  var r = buf && buf.length ? this.write(buf) : '';
-  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
-  return r;
-}
-
-// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
-function simpleWrite(buf) {
-  return buf.toString(this.encoding);
-}
-
-function simpleEnd(buf) {
-  return buf && buf.length ? this.write(buf) : '';
-}
-
-/***/ }),
-
-/***/ "./node_modules/_timed-out@4.0.1@timed-out/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function (req, time) {
-	if (req.timeoutTimer) {
-		return req;
-	}
-
-	var delays = isNaN(time) ? time : {socket: time, connect: time};
-	var host = req._headers ? (' to ' + req._headers.host) : '';
-
-	if (delays.connect !== undefined) {
-		req.timeoutTimer = setTimeout(function timeoutHandler() {
-			req.abort();
-			var e = new Error('Connection timed out on request' + host);
-			e.code = 'ETIMEDOUT';
-			req.emit('error', e);
-		}, delays.connect);
-	}
-
-	// Clear the connection timeout timer once a socket is assigned to the
-	// request and is connected.
-	req.on('socket', function assign(socket) {
-		// Socket may come from Agent pool and may be already connected.
-		if (!(socket.connecting || socket._connecting)) {
-			connect();
-			return;
-		}
-
-		socket.once('connect', connect);
-	});
-
-	function clear() {
-		if (req.timeoutTimer) {
-			clearTimeout(req.timeoutTimer);
-			req.timeoutTimer = null;
-		}
-	}
-
-	function connect() {
-		clear();
-
-		if (delays.socket !== undefined) {
-			// Abort the request if there is no activity on the socket for more
-			// than `delays.socket` milliseconds.
-			req.setTimeout(delays.socket, function socketTimeoutHandler() {
-				req.abort();
-				var e = new Error('Socket timed out on request' + host);
-				e.code = 'ESOCKETTIMEDOUT';
-				req.emit('error', e);
-			});
-		}
-	}
-
-	return req.on('error', clear);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/_url-parse-lax@3.0.0@url-parse-lax/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-const url = __webpack_require__("url");
-const prependHttp = __webpack_require__("./node_modules/_prepend-http@2.0.0@prepend-http/index.js");
-
-module.exports = (input, options) => {
-	if (typeof input !== 'string') {
-		throw new TypeError(`Expected \`url\` to be of type \`string\`, got \`${typeof input}\` instead.`);
-	}
-
-	const finalUrl = prependHttp(input, Object.assign({https: true}, options));
-	return url.parse(finalUrl);
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/_url-to-options@1.0.1@url-to-options/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-
-
-// Copied from https://github.com/nodejs/node/blob/master/lib/internal/url.js
-
-function urlToOptions(url) {
-  var options = {
-    protocol: url.protocol,
-    hostname: url.hostname,
-    hash: url.hash,
-    search: url.search,
-    pathname: url.pathname,
-    path: `${url.pathname}${url.search}`,
-    href: url.href
-  };
-  if (url.port !== '') {
-    options.port = Number(url.port);
-  }
-  if (url.username || url.password) {
-    options.auth = `${url.username}:${url.password}`;
-  }
-  return options;
-}
-
-
-
-module.exports = urlToOptions;
-
-
-/***/ }),
-
-/***/ "./node_modules/_util-deprecate@1.0.2@util-deprecate/node.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-
-/**
- * For Node.js, simply re-export the core `util.deprecate` function.
- */
-
-module.exports = __webpack_require__("util").deprecate;
-
-
-/***/ }),
-
-/***/ "./node_modules/electron-is-dev/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
-
-
-/***/ }),
-
-/***/ "./node_modules/electron-is/is.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/*
- * Project: electron-is
- * Version: 2.4.0
- * Author: delvedor
- * Twitter: @delvedor
- * License: MIT
- * GitHub: https://github.com/delvedor/electron-is
- */
-
-
-
-const semver = __webpack_require__("./node_modules/semver/semver.js")
-const gt = semver.gt
-const lt = semver.lt
-const release = __webpack_require__("os").release
-const isDev = __webpack_require__("./node_modules/electron-is-dev/index.js")
-
-// Constructor
-function IsApi () {}
-
-// Checks if we are in renderer process
-IsApi.prototype.renderer = function () {
-  return process.type === 'renderer'
-}
-
-// Checks if we are in main process
-IsApi.prototype.main = function () {
-  return process.type === 'browser'
-}
-
-// Checks if we are under Mac OS
-IsApi.prototype.osx = IsApi.prototype.macOS = function () {
-  return process.platform === 'darwin'
-}
-
-// Checks if we are under Windows OS
-IsApi.prototype.windows = function () {
-  return process.platform === 'win32'
-}
-
-// Checks if we are under Linux OS
-IsApi.prototype.linux = function () {
-  return process.platform === 'linux'
-}
-
-// Checks if we are the processor's arch is x86
-IsApi.prototype.x86 = function () {
-  return process.arch === 'ia32'
-}
-
-// Checks if we are the processor's arch is x64
-IsApi.prototype.x64 = function () {
-  return process.arch === 'x64'
-}
-
-// Checks if the env is setted to 'production'
-IsApi.prototype.production = function () {
-  return !isDev
-}
-
-// Checks if the env is setted to 'dev'
-IsApi.prototype.dev = function () {
-  return isDev
-}
-
-// Checks if the app is running in a sandbox on macOS
-IsApi.prototype.sandbox = function () {
-  return 'APP_SANDBOX_CONTAINER_ID' in process.env
-}
-// Checks if the app is running as a Mac App Store build
-IsApi.prototype.mas = function () {
-  return process.mas === true
-}
-// Checks if the app is running as a Windows Store (appx) build
-IsApi.prototype.windowsStore = function () {
-  return process.windowsStore === true
-}
-
-// checks if all the 'is functions' passed as arguments are true
-IsApi.prototype.all = function () {
-  const isFunctions = new Array(arguments.length)
-  for (var i = 0; i < isFunctions.length; i++) {
-    isFunctions[i] = arguments[i]
-  }
-  if (!isFunctions.length) return
-  for (i = 0; i < isFunctions.length; i++) {
-    if (!isFunctions[i]()) return false
-  }
-  return true
-}
-
-// checks if all the 'is functions' passed as arguments are false
-IsApi.prototype.none = function () {
-  const isFunctions = new Array(arguments.length)
-  for (var i = 0; i < isFunctions.length; i++) {
-    isFunctions[i] = arguments[i]
-  }
-  if (!isFunctions.length) return
-  for (i = 0; i < isFunctions.length; i++) {
-    if (isFunctions[i]()) return false
-  }
-  return true
-}
-
-// returns true if one of the 'is functions' passed as argument is true
-IsApi.prototype.one = function () {
-  const isFunctions = new Array(arguments.length)
-  for (var i = 0; i < isFunctions.length; i++) {
-    isFunctions[i] = arguments[i]
-  }
-  if (!isFunctions.length) return
-  for (i = 0; i < isFunctions.length; i++) {
-    if (isFunctions[i]()) return true
-  }
-  return false
-}
-
-// checks the if the given release is the same of the OS
-IsApi.prototype.release = function (requested) {
-  if (this.osx()) {
-    return requested === osxRelease()
-  } else if (this.windows()) {
-    requested = requested.split('.')
-    const actual = release().split('.')
-    if (requested.length === 2) {
-      return `${actual[0]}.${actual[1]}` === `${requested[0]}.${requested[1]}`
-    }
-    return `${actual[0]}.${actual[1]}.${actual[2]}` === `${requested[0]}.${requested[1]}.${requested[2]}`
-  } else {
-    // Not implemented for Linux yet
-    return null
-  }
-}
-
-// checks if the given release is greater than the current OS release
-IsApi.prototype.gtRelease = function (requested) {
-  if (this.osx()) {
-    return gt(requested, osxRelease())
-  } else if (this.windows()) {
-    requested = requested.split('.')
-    const actual = release().split('.')
-    if (requested.length === 2) {
-      return gt(`${requested[0]}.${requested[1]}.0`, `${actual[0]}.${actual[1]}.0`)
-    }
-    return gt(`${requested[0]}.${requested[1]}.${requested[2]}`, `${actual[0]}.${actual[1]}.${actual[2]}`)
-  } else {
-    // Not implemented for Linux yet
-    return null
-  }
-}
-
-// checks if the given release is less than the current OS release
-IsApi.prototype.ltRelease = function (requested) {
-  if (this.osx()) {
-    return lt(requested, osxRelease())
-  } else if (this.windows()) {
-    requested = requested.split('.')
-    const actual = release().split('.')
-    if (requested.length === 2) {
-      return lt(`${requested[0]}.${requested[1]}.0`, `${actual[0]}.${actual[1]}.0`)
-    }
-    return lt(`${requested[0]}.${requested[1]}.${requested[2]}`, `${actual[0]}.${actual[1]}.${actual[2]}`)
-  } else {
-    // Not implemented for Linux yet
-    return null
-  }
-}
-
-// returns the current osx release
-function osxRelease () {
-  const actual = release().split('.')
-  return `10.${actual[0] - 4}.${actual[1]}`
-}
-
-// exports
-module.exports = new IsApi()
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/copy-sync/copy-sync.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const mkdirpSync = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js").mkdirsSync
-const utimesSync = __webpack_require__("./node_modules/fs-extra/lib/util/utimes.js").utimesMillisSync
-
-const notExist = Symbol('notExist')
-const existsReg = Symbol('existsReg')
-
-function copySync (src, dest, opts) {
-  if (typeof opts === 'function') {
-    opts = {filter: opts}
-  }
-
-  opts = opts || {}
-  opts.clobber = 'clobber' in opts ? !!opts.clobber : true // default to true for now
-  opts.overwrite = 'overwrite' in opts ? !!opts.overwrite : opts.clobber // overwrite falls back to clobber
-
-  // Warn about using preserveTimestamps on 32-bit node
-  if (opts.preserveTimestamps && process.arch === 'ia32') {
-    console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;\n
-    see https://github.com/jprichardson/node-fs-extra/issues/269`)
-  }
-
-  src = path.resolve(src)
-  dest = path.resolve(dest)
-
-  // don't allow src and dest to be the same
-  if (src === dest) throw new Error('Source and destination must not be the same.')
-
-  if (opts.filter && !opts.filter(src, dest)) return
-
-  const destParent = path.dirname(dest)
-  if (!fs.existsSync(destParent)) mkdirpSync(destParent)
-  return startCopy(src, dest, opts)
-}
-
-function startCopy (src, dest, opts) {
-  if (opts.filter && !opts.filter(src, dest)) return
-  return getStats(src, dest, opts)
-}
-
-function getStats (src, dest, opts) {
-  const statSync = opts.dereference ? fs.statSync : fs.lstatSync
-  const st = statSync(src)
-
-  if (st.isDirectory()) return onDir(st, src, dest, opts)
-  else if (st.isFile() ||
-           st.isCharacterDevice() ||
-           st.isBlockDevice()) return onFile(st, src, dest, opts)
-  else if (st.isSymbolicLink()) return onLink(src, dest, opts)
-}
-
-function onFile (srcStat, src, dest, opts) {
-  const resolvedPath = checkDest(dest)
-  if (resolvedPath === notExist) {
-    return copyFile(srcStat, src, dest, opts)
-  } else if (resolvedPath === existsReg) {
-    return mayCopyFile(srcStat, src, dest, opts)
-  } else {
-    if (src === resolvedPath) return
-    return mayCopyFile(srcStat, src, dest, opts)
-  }
-}
-
-function mayCopyFile (srcStat, src, dest, opts) {
-  if (opts.overwrite) {
-    fs.unlinkSync(dest)
-    return copyFile(srcStat, src, dest, opts)
-  } else if (opts.errorOnExist) {
-    throw new Error(`'${dest}' already exists`)
-  }
-}
-
-function copyFile (srcStat, src, dest, opts) {
-  if (typeof fs.copyFileSync === 'function') {
-    fs.copyFileSync(src, dest)
-    fs.chmodSync(dest, srcStat.mode)
-    if (opts.preserveTimestamps) {
-      return utimesSync(dest, srcStat.atime, srcStat.mtime)
-    }
-    return
-  }
-  return copyFileFallback(srcStat, src, dest, opts)
-}
-
-function copyFileFallback (srcStat, src, dest, opts) {
-  const BUF_LENGTH = 64 * 1024
-  const _buff = __webpack_require__("./node_modules/fs-extra/lib/util/buffer.js")(BUF_LENGTH)
-
-  const fdr = fs.openSync(src, 'r')
-  const fdw = fs.openSync(dest, 'w', srcStat.mode)
-  let bytesRead = 1
-  let pos = 0
-
-  while (bytesRead > 0) {
-    bytesRead = fs.readSync(fdr, _buff, 0, BUF_LENGTH, pos)
-    fs.writeSync(fdw, _buff, 0, bytesRead)
-    pos += bytesRead
-  }
-
-  if (opts.preserveTimestamps) fs.futimesSync(fdw, srcStat.atime, srcStat.mtime)
-
-  fs.closeSync(fdr)
-  fs.closeSync(fdw)
-}
-
-function onDir (srcStat, src, dest, opts) {
-  const resolvedPath = checkDest(dest)
-  if (resolvedPath === notExist) {
-    if (isSrcSubdir(src, dest)) {
-      throw new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`)
-    }
-    return mkDirAndCopy(srcStat, src, dest, opts)
-  } else if (resolvedPath === existsReg) {
-    if (isSrcSubdir(src, dest)) {
-      throw new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`)
-    }
-    return mayCopyDir(src, dest, opts)
-  } else {
-    if (src === resolvedPath) return
-    return copyDir(src, dest, opts)
-  }
-}
-
-function mayCopyDir (src, dest, opts) {
-  if (!fs.statSync(dest).isDirectory()) {
-    throw new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`)
-  }
-  return copyDir(src, dest, opts)
-}
-
-function mkDirAndCopy (srcStat, src, dest, opts) {
-  fs.mkdirSync(dest, srcStat.mode)
-  fs.chmodSync(dest, srcStat.mode)
-  return copyDir(src, dest, opts)
-}
-
-function copyDir (src, dest, opts) {
-  fs.readdirSync(src).forEach(item => {
-    startCopy(path.join(src, item), path.join(dest, item), opts)
-  })
-}
-
-function onLink (src, dest, opts) {
-  let resolvedSrcPath = fs.readlinkSync(src)
-
-  if (opts.dereference) {
-    resolvedSrcPath = path.resolve(process.cwd(), resolvedSrcPath)
-  }
-
-  let resolvedDestPath = checkDest(dest)
-  if (resolvedDestPath === notExist || resolvedDestPath === existsReg) {
-    // if dest already exists, fs throws error anyway,
-    // so no need to guard against it here.
-    return fs.symlinkSync(resolvedSrcPath, dest)
-  } else {
-    if (opts.dereference) {
-      resolvedDestPath = path.resolve(process.cwd(), resolvedDestPath)
-    }
-    if (resolvedDestPath === resolvedSrcPath) return
-
-    // prevent copy if src is a subdir of dest since unlinking
-    // dest in this case would result in removing src contents
-    // and therefore a broken symlink would be created.
-    if (fs.statSync(dest).isDirectory() && isSrcSubdir(resolvedDestPath, resolvedSrcPath)) {
-      throw new Error(`Cannot overwrite '${resolvedDestPath}' with '${resolvedSrcPath}'.`)
-    }
-    return copyLink(resolvedSrcPath, dest)
-  }
-}
-
-function copyLink (resolvedSrcPath, dest) {
-  fs.unlinkSync(dest)
-  return fs.symlinkSync(resolvedSrcPath, dest)
-}
-
-// check if dest exists and/or is a symlink
-function checkDest (dest) {
-  let resolvedPath
-  try {
-    resolvedPath = fs.readlinkSync(dest)
-  } catch (err) {
-    if (err.code === 'ENOENT') return notExist
-
-    // dest exists and is a regular file or directory, Windows may throw UNKNOWN error
-    if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return existsReg
-
-    throw err
-  }
-  return resolvedPath // dest exists and is a symlink
-}
-
-// return true if dest is a subdir of src, otherwise false.
-// extract dest base dir and check if that is the same as src basename
-function isSrcSubdir (src, dest) {
-  const baseDir = dest.split(path.dirname(src) + path.sep)[1]
-  if (baseDir) {
-    const destBasename = baseDir.split(path.sep)[0]
-    if (destBasename) {
-      return src !== dest && dest.indexOf(src) > -1 && destBasename === path.basename(src)
-    }
-    return false
-  }
-  return false
-}
-
-module.exports = copySync
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/copy-sync/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = {
-  copySync: __webpack_require__("./node_modules/fs-extra/lib/copy-sync/copy-sync.js")
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/copy/copy.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const mkdirp = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js").mkdirs
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-const utimes = __webpack_require__("./node_modules/fs-extra/lib/util/utimes.js").utimesMillis
-
-const notExist = Symbol('notExist')
-const existsReg = Symbol('existsReg')
-
-function copy (src, dest, opts, cb) {
-  if (typeof opts === 'function' && !cb) {
-    cb = opts
-    opts = {}
-  } else if (typeof opts === 'function') {
-    opts = {filter: opts}
-  }
-
-  cb = cb || function () {}
-  opts = opts || {}
-
-  opts.clobber = 'clobber' in opts ? !!opts.clobber : true // default to true for now
-  opts.overwrite = 'overwrite' in opts ? !!opts.overwrite : opts.clobber // overwrite falls back to clobber
-
-  // Warn about using preserveTimestamps on 32-bit node
-  if (opts.preserveTimestamps && process.arch === 'ia32') {
-    console.warn(`fs-extra: Using the preserveTimestamps option in 32-bit node is not recommended;\n
-    see https://github.com/jprichardson/node-fs-extra/issues/269`)
-  }
-
-  src = path.resolve(src)
-  dest = path.resolve(dest)
-
-  // don't allow src and dest to be the same
-  if (src === dest) return cb(new Error('Source and destination must not be the same.'))
-
-  if (opts.filter) return handleFilter(checkParentDir, src, dest, opts, cb)
-  return checkParentDir(src, dest, opts, cb)
-}
-
-function checkParentDir (src, dest, opts, cb) {
-  const destParent = path.dirname(dest)
-  pathExists(destParent, (err, dirExists) => {
-    if (err) return cb(err)
-    if (dirExists) return startCopy(src, dest, opts, cb)
-    mkdirp(destParent, err => {
-      if (err) return cb(err)
-      return startCopy(src, dest, opts, cb)
-    })
-  })
-}
-
-function startCopy (src, dest, opts, cb) {
-  if (opts.filter) return handleFilter(getStats, src, dest, opts, cb)
-  return getStats(src, dest, opts, cb)
-}
-
-function handleFilter (onInclude, src, dest, opts, cb) {
-  Promise.resolve(opts.filter(src, dest))
-    .then(include => {
-      if (include) return onInclude(src, dest, opts, cb)
-      return cb()
-    }, error => cb(error))
-}
-
-function getStats (src, dest, opts, cb) {
-  const stat = opts.dereference ? fs.stat : fs.lstat
-  stat(src, (err, st) => {
-    if (err) return cb(err)
-
-    if (st.isDirectory()) return onDir(st, src, dest, opts, cb)
-    else if (st.isFile() ||
-             st.isCharacterDevice() ||
-             st.isBlockDevice()) return onFile(st, src, dest, opts, cb)
-    else if (st.isSymbolicLink()) return onLink(src, dest, opts, cb)
-  })
-}
-
-function onFile (srcStat, src, dest, opts, cb) {
-  checkDest(dest, (err, resolvedPath) => {
-    if (err) return cb(err)
-    if (resolvedPath === notExist) {
-      return copyFile(srcStat, src, dest, opts, cb)
-    } else if (resolvedPath === existsReg) {
-      return mayCopyFile(srcStat, src, dest, opts, cb)
-    } else {
-      if (src === resolvedPath) return cb()
-      return mayCopyFile(srcStat, src, dest, opts, cb)
-    }
-  })
-}
-
-function mayCopyFile (srcStat, src, dest, opts, cb) {
-  if (opts.overwrite) {
-    fs.unlink(dest, err => {
-      if (err) return cb(err)
-      return copyFile(srcStat, src, dest, opts, cb)
-    })
-  } else if (opts.errorOnExist) {
-    return cb(new Error(`'${dest}' already exists`))
-  } else return cb()
-}
-
-function copyFile (srcStat, src, dest, opts, cb) {
-  if (typeof fs.copyFile === 'function') {
-    return fs.copyFile(src, dest, err => {
-      if (err) return cb(err)
-      return setDestModeAndTimestamps(srcStat, dest, opts, cb)
-    })
-  }
-  return copyFileFallback(srcStat, src, dest, opts, cb)
-}
-
-function copyFileFallback (srcStat, src, dest, opts, cb) {
-  const rs = fs.createReadStream(src)
-  rs.on('error', err => cb(err))
-    .once('open', () => {
-      const ws = fs.createWriteStream(dest, { mode: srcStat.mode })
-      ws.on('error', err => cb(err))
-        .on('open', () => rs.pipe(ws))
-        .once('close', () => setDestModeAndTimestamps(srcStat, dest, opts, cb))
-    })
-}
-
-function setDestModeAndTimestamps (srcStat, dest, opts, cb) {
-  fs.chmod(dest, srcStat.mode, err => {
-    if (err) return cb(err)
-    if (opts.preserveTimestamps) {
-      return utimes(dest, srcStat.atime, srcStat.mtime, cb)
-    }
-    return cb()
-  })
-}
-
-function onDir (srcStat, src, dest, opts, cb) {
-  checkDest(dest, (err, resolvedPath) => {
-    if (err) return cb(err)
-    if (resolvedPath === notExist) {
-      if (isSrcSubdir(src, dest)) {
-        return cb(new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`))
-      }
-      return mkDirAndCopy(srcStat, src, dest, opts, cb)
-    } else if (resolvedPath === existsReg) {
-      if (isSrcSubdir(src, dest)) {
-        return cb(new Error(`Cannot copy '${src}' to a subdirectory of itself, '${dest}'.`))
-      }
-      return mayCopyDir(src, dest, opts, cb)
-    } else {
-      if (src === resolvedPath) return cb()
-      return copyDir(src, dest, opts, cb)
-    }
-  })
-}
-
-function mayCopyDir (src, dest, opts, cb) {
-  fs.stat(dest, (err, st) => {
-    if (err) return cb(err)
-    if (!st.isDirectory()) {
-      return cb(new Error(`Cannot overwrite non-directory '${dest}' with directory '${src}'.`))
-    }
-    return copyDir(src, dest, opts, cb)
-  })
-}
-
-function mkDirAndCopy (srcStat, src, dest, opts, cb) {
-  fs.mkdir(dest, srcStat.mode, err => {
-    if (err) return cb(err)
-    fs.chmod(dest, srcStat.mode, err => {
-      if (err) return cb(err)
-      return copyDir(src, dest, opts, cb)
-    })
-  })
-}
-
-function copyDir (src, dest, opts, cb) {
-  fs.readdir(src, (err, items) => {
-    if (err) return cb(err)
-    return copyDirItems(items, src, dest, opts, cb)
-  })
-}
-
-function copyDirItems (items, src, dest, opts, cb) {
-  const item = items.pop()
-  if (!item) return cb()
-  startCopy(path.join(src, item), path.join(dest, item), opts, err => {
-    if (err) return cb(err)
-    return copyDirItems(items, src, dest, opts, cb)
-  })
-}
-
-function onLink (src, dest, opts, cb) {
-  fs.readlink(src, (err, resolvedSrcPath) => {
-    if (err) return cb(err)
-
-    if (opts.dereference) {
-      resolvedSrcPath = path.resolve(process.cwd(), resolvedSrcPath)
-    }
-
-    checkDest(dest, (err, resolvedDestPath) => {
-      if (err) return cb(err)
-
-      if (resolvedDestPath === notExist || resolvedDestPath === existsReg) {
-        // if dest already exists, fs throws error anyway,
-        // so no need to guard against it here.
-        return fs.symlink(resolvedSrcPath, dest, cb)
-      } else {
-        if (opts.dereference) {
-          resolvedDestPath = path.resolve(process.cwd(), resolvedDestPath)
-        }
-        if (resolvedDestPath === resolvedSrcPath) return cb()
-
-        // prevent copy if src is a subdir of dest since unlinking
-        // dest in this case would result in removing src contents
-        // and therefore a broken symlink would be created.
-        fs.stat(dest, (err, st) => {
-          if (err) return cb(err)
-          if (st.isDirectory() && isSrcSubdir(resolvedDestPath, resolvedSrcPath)) {
-            return cb(new Error(`Cannot overwrite '${resolvedDestPath}' with '${resolvedSrcPath}'.`))
-          }
-          return copyLink(resolvedSrcPath, dest, cb)
-        })
-      }
-    })
-  })
-}
-
-function copyLink (resolvedSrcPath, dest, cb) {
-  fs.unlink(dest, err => {
-    if (err) return cb(err)
-    return fs.symlink(resolvedSrcPath, dest, cb)
-  })
-}
-
-// check if dest exists and/or is a symlink
-function checkDest (dest, cb) {
-  fs.readlink(dest, (err, resolvedPath) => {
-    if (err) {
-      if (err.code === 'ENOENT') return cb(null, notExist)
-
-      // dest exists and is a regular file or directory, Windows may throw UNKNOWN error.
-      if (err.code === 'EINVAL' || err.code === 'UNKNOWN') return cb(null, existsReg)
-
-      return cb(err)
-    }
-    return cb(null, resolvedPath) // dest exists and is a symlink
-  })
-}
-
-// return true if dest is a subdir of src, otherwise false.
-// extract dest base dir and check if that is the same as src basename
-function isSrcSubdir (src, dest) {
-  const baseDir = dest.split(path.dirname(src) + path.sep)[1]
-  if (baseDir) {
-    const destBasename = baseDir.split(path.sep)[0]
-    if (destBasename) {
-      return src !== dest && dest.indexOf(src) > -1 && destBasename === path.basename(src)
-    }
-    return false
-  }
-  return false
-}
-
-module.exports = copy
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/copy/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-module.exports = {
-  copy: u(__webpack_require__("./node_modules/fs-extra/lib/copy/copy.js"))
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/empty/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const fs = __webpack_require__("fs")
-const path = __webpack_require__("path")
-const mkdir = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const remove = __webpack_require__("./node_modules/fs-extra/lib/remove/index.js")
-
-const emptyDir = u(function emptyDir (dir, callback) {
-  callback = callback || function () {}
-  fs.readdir(dir, (err, items) => {
-    if (err) return mkdir.mkdirs(dir, callback)
-
-    items = items.map(item => path.join(dir, item))
-
-    deleteItem()
-
-    function deleteItem () {
-      const item = items.pop()
-      if (!item) return callback()
-      remove.remove(item, err => {
-        if (err) return callback(err)
-        deleteItem()
-      })
-    }
-  })
-})
-
-function emptyDirSync (dir) {
-  let items
-  try {
-    items = fs.readdirSync(dir)
-  } catch (err) {
-    return mkdir.mkdirsSync(dir)
-  }
-
-  items.forEach(item => {
-    item = path.join(dir, item)
-    remove.removeSync(item)
-  })
-}
-
-module.exports = {
-  emptyDirSync,
-  emptydirSync: emptyDirSync,
-  emptyDir,
-  emptydir: emptyDir
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/ensure/file.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const path = __webpack_require__("path")
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const mkdir = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-
-function createFile (file, callback) {
-  function makeFile () {
-    fs.writeFile(file, '', err => {
-      if (err) return callback(err)
-      callback()
-    })
-  }
-
-  fs.stat(file, (err, stats) => { // eslint-disable-line handle-callback-err
-    if (!err && stats.isFile()) return callback()
-    const dir = path.dirname(file)
-    pathExists(dir, (err, dirExists) => {
-      if (err) return callback(err)
-      if (dirExists) return makeFile()
-      mkdir.mkdirs(dir, err => {
-        if (err) return callback(err)
-        makeFile()
-      })
-    })
-  })
-}
-
-function createFileSync (file) {
-  let stats
-  try {
-    stats = fs.statSync(file)
-  } catch (e) {}
-  if (stats && stats.isFile()) return
-
-  const dir = path.dirname(file)
-  if (!fs.existsSync(dir)) {
-    mkdir.mkdirsSync(dir)
-  }
-
-  fs.writeFileSync(file, '')
-}
-
-module.exports = {
-  createFile: u(createFile),
-  createFileSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/ensure/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const file = __webpack_require__("./node_modules/fs-extra/lib/ensure/file.js")
-const link = __webpack_require__("./node_modules/fs-extra/lib/ensure/link.js")
-const symlink = __webpack_require__("./node_modules/fs-extra/lib/ensure/symlink.js")
-
-module.exports = {
-  // file
-  createFile: file.createFile,
-  createFileSync: file.createFileSync,
-  ensureFile: file.createFile,
-  ensureFileSync: file.createFileSync,
-  // link
-  createLink: link.createLink,
-  createLinkSync: link.createLinkSync,
-  ensureLink: link.createLink,
-  ensureLinkSync: link.createLinkSync,
-  // symlink
-  createSymlink: symlink.createSymlink,
-  createSymlinkSync: symlink.createSymlinkSync,
-  ensureSymlink: symlink.createSymlink,
-  ensureSymlinkSync: symlink.createSymlinkSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/ensure/link.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const path = __webpack_require__("path")
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const mkdir = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-
-function createLink (srcpath, dstpath, callback) {
-  function makeLink (srcpath, dstpath) {
-    fs.link(srcpath, dstpath, err => {
-      if (err) return callback(err)
-      callback(null)
-    })
-  }
-
-  pathExists(dstpath, (err, destinationExists) => {
-    if (err) return callback(err)
-    if (destinationExists) return callback(null)
-    fs.lstat(srcpath, (err, stat) => {
-      if (err) {
-        err.message = err.message.replace('lstat', 'ensureLink')
-        return callback(err)
-      }
-
-      const dir = path.dirname(dstpath)
-      pathExists(dir, (err, dirExists) => {
-        if (err) return callback(err)
-        if (dirExists) return makeLink(srcpath, dstpath)
-        mkdir.mkdirs(dir, err => {
-          if (err) return callback(err)
-          makeLink(srcpath, dstpath)
-        })
-      })
-    })
-  })
-}
-
-function createLinkSync (srcpath, dstpath, callback) {
-  const destinationExists = fs.existsSync(dstpath)
-  if (destinationExists) return undefined
-
-  try {
-    fs.lstatSync(srcpath)
-  } catch (err) {
-    err.message = err.message.replace('lstat', 'ensureLink')
-    throw err
-  }
-
-  const dir = path.dirname(dstpath)
-  const dirExists = fs.existsSync(dir)
-  if (dirExists) return fs.linkSync(srcpath, dstpath)
-  mkdir.mkdirsSync(dir)
-
-  return fs.linkSync(srcpath, dstpath)
-}
-
-module.exports = {
-  createLink: u(createLink),
-  createLinkSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/ensure/symlink-paths.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const path = __webpack_require__("path")
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-
-/**
- * Function that returns two types of paths, one relative to symlink, and one
- * relative to the current working directory. Checks if path is absolute or
- * relative. If the path is relative, this function checks if the path is
- * relative to symlink or relative to current working directory. This is an
- * initiative to find a smarter `srcpath` to supply when building symlinks.
- * This allows you to determine which path to use out of one of three possible
- * types of source paths. The first is an absolute path. This is detected by
- * `path.isAbsolute()`. When an absolute path is provided, it is checked to
- * see if it exists. If it does it's used, if not an error is returned
- * (callback)/ thrown (sync). The other two options for `srcpath` are a
- * relative url. By default Node's `fs.symlink` works by creating a symlink
- * using `dstpath` and expects the `srcpath` to be relative to the newly
- * created symlink. If you provide a `srcpath` that does not exist on the file
- * system it results in a broken symlink. To minimize this, the function
- * checks to see if the 'relative to symlink' source file exists, and if it
- * does it will use it. If it does not, it checks if there's a file that
- * exists that is relative to the current working directory, if does its used.
- * This preserves the expectations of the original fs.symlink spec and adds
- * the ability to pass in `relative to current working direcotry` paths.
- */
-
-function symlinkPaths (srcpath, dstpath, callback) {
-  if (path.isAbsolute(srcpath)) {
-    return fs.lstat(srcpath, (err, stat) => {
-      if (err) {
-        err.message = err.message.replace('lstat', 'ensureSymlink')
-        return callback(err)
-      }
-      return callback(null, {
-        'toCwd': srcpath,
-        'toDst': srcpath
-      })
-    })
-  } else {
-    const dstdir = path.dirname(dstpath)
-    const relativeToDst = path.join(dstdir, srcpath)
-    return pathExists(relativeToDst, (err, exists) => {
-      if (err) return callback(err)
-      if (exists) {
-        return callback(null, {
-          'toCwd': relativeToDst,
-          'toDst': srcpath
-        })
-      } else {
-        return fs.lstat(srcpath, (err, stat) => {
-          if (err) {
-            err.message = err.message.replace('lstat', 'ensureSymlink')
-            return callback(err)
-          }
-          return callback(null, {
-            'toCwd': srcpath,
-            'toDst': path.relative(dstdir, srcpath)
-          })
-        })
-      }
-    })
-  }
-}
-
-function symlinkPathsSync (srcpath, dstpath) {
-  let exists
-  if (path.isAbsolute(srcpath)) {
-    exists = fs.existsSync(srcpath)
-    if (!exists) throw new Error('absolute srcpath does not exist')
-    return {
-      'toCwd': srcpath,
-      'toDst': srcpath
-    }
-  } else {
-    const dstdir = path.dirname(dstpath)
-    const relativeToDst = path.join(dstdir, srcpath)
-    exists = fs.existsSync(relativeToDst)
-    if (exists) {
-      return {
-        'toCwd': relativeToDst,
-        'toDst': srcpath
-      }
-    } else {
-      exists = fs.existsSync(srcpath)
-      if (!exists) throw new Error('relative srcpath does not exist')
-      return {
-        'toCwd': srcpath,
-        'toDst': path.relative(dstdir, srcpath)
-      }
-    }
-  }
-}
-
-module.exports = {
-  symlinkPaths,
-  symlinkPathsSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/ensure/symlink-type.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-
-function symlinkType (srcpath, type, callback) {
-  callback = (typeof type === 'function') ? type : callback
-  type = (typeof type === 'function') ? false : type
-  if (type) return callback(null, type)
-  fs.lstat(srcpath, (err, stats) => {
-    if (err) return callback(null, 'file')
-    type = (stats && stats.isDirectory()) ? 'dir' : 'file'
-    callback(null, type)
-  })
-}
-
-function symlinkTypeSync (srcpath, type) {
-  let stats
-
-  if (type) return type
-  try {
-    stats = fs.lstatSync(srcpath)
-  } catch (e) {
-    return 'file'
-  }
-  return (stats && stats.isDirectory()) ? 'dir' : 'file'
-}
-
-module.exports = {
-  symlinkType,
-  symlinkTypeSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/ensure/symlink.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const path = __webpack_require__("path")
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const _mkdirs = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const mkdirs = _mkdirs.mkdirs
-const mkdirsSync = _mkdirs.mkdirsSync
-
-const _symlinkPaths = __webpack_require__("./node_modules/fs-extra/lib/ensure/symlink-paths.js")
-const symlinkPaths = _symlinkPaths.symlinkPaths
-const symlinkPathsSync = _symlinkPaths.symlinkPathsSync
-
-const _symlinkType = __webpack_require__("./node_modules/fs-extra/lib/ensure/symlink-type.js")
-const symlinkType = _symlinkType.symlinkType
-const symlinkTypeSync = _symlinkType.symlinkTypeSync
-
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-
-function createSymlink (srcpath, dstpath, type, callback) {
-  callback = (typeof type === 'function') ? type : callback
-  type = (typeof type === 'function') ? false : type
-
-  pathExists(dstpath, (err, destinationExists) => {
-    if (err) return callback(err)
-    if (destinationExists) return callback(null)
-    symlinkPaths(srcpath, dstpath, (err, relative) => {
-      if (err) return callback(err)
-      srcpath = relative.toDst
-      symlinkType(relative.toCwd, type, (err, type) => {
-        if (err) return callback(err)
-        const dir = path.dirname(dstpath)
-        pathExists(dir, (err, dirExists) => {
-          if (err) return callback(err)
-          if (dirExists) return fs.symlink(srcpath, dstpath, type, callback)
-          mkdirs(dir, err => {
-            if (err) return callback(err)
-            fs.symlink(srcpath, dstpath, type, callback)
-          })
-        })
-      })
-    })
-  })
-}
-
-function createSymlinkSync (srcpath, dstpath, type, callback) {
-  callback = (typeof type === 'function') ? type : callback
-  type = (typeof type === 'function') ? false : type
-
-  const destinationExists = fs.existsSync(dstpath)
-  if (destinationExists) return undefined
-
-  const relative = symlinkPathsSync(srcpath, dstpath)
-  srcpath = relative.toDst
-  type = symlinkTypeSync(relative.toCwd, type)
-  const dir = path.dirname(dstpath)
-  const exists = fs.existsSync(dir)
-  if (exists) return fs.symlinkSync(srcpath, dstpath, type)
-  mkdirsSync(dir)
-  return fs.symlinkSync(srcpath, dstpath, type)
-}
-
-module.exports = {
-  createSymlink: u(createSymlink),
-  createSymlinkSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/fs/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-// This is adapted from https://github.com/normalize/mz
-// Copyright (c) 2014-2016 Jonathan Ong me@jongleberry.com and Contributors
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-
-const api = [
-  'access',
-  'appendFile',
-  'chmod',
-  'chown',
-  'close',
-  'copyFile',
-  'fchmod',
-  'fchown',
-  'fdatasync',
-  'fstat',
-  'fsync',
-  'ftruncate',
-  'futimes',
-  'lchown',
-  'link',
-  'lstat',
-  'mkdir',
-  'mkdtemp',
-  'open',
-  'readFile',
-  'readdir',
-  'readlink',
-  'realpath',
-  'rename',
-  'rmdir',
-  'stat',
-  'symlink',
-  'truncate',
-  'unlink',
-  'utimes',
-  'writeFile'
-].filter(key => {
-  // Some commands are not available on some systems. Ex:
-  // fs.copyFile was added in Node.js v8.5.0
-  // fs.mkdtemp was added in Node.js v5.10.0
-  // fs.lchown is not available on at least some Linux
-  return typeof fs[key] === 'function'
-})
-
-// Export all keys:
-Object.keys(fs).forEach(key => {
-  exports[key] = fs[key]
-})
-
-// Universalify async methods:
-api.forEach(method => {
-  exports[method] = u(fs[method])
-})
-
-// We differ from mz/fs in that we still ship the old, broken, fs.exists()
-// since we are a drop-in replacement for the native module
-exports.exists = function (filename, callback) {
-  if (typeof callback === 'function') {
-    return fs.exists(filename, callback)
-  }
-  return new Promise(resolve => {
-    return fs.exists(filename, resolve)
-  })
-}
-
-// fs.read() & fs.write need special treatment due to multiple callback args
-
-exports.read = function (fd, buffer, offset, length, position, callback) {
-  if (typeof callback === 'function') {
-    return fs.read(fd, buffer, offset, length, position, callback)
-  }
-  return new Promise((resolve, reject) => {
-    fs.read(fd, buffer, offset, length, position, (err, bytesRead, buffer) => {
-      if (err) return reject(err)
-      resolve({ bytesRead, buffer })
-    })
-  })
-}
-
-// Function signature can be
-// fs.write(fd, buffer[, offset[, length[, position]]], callback)
-// OR
-// fs.write(fd, string[, position[, encoding]], callback)
-// so we need to handle both cases
-exports.write = function (fd, buffer, a, b, c, callback) {
-  if (typeof arguments[arguments.length - 1] === 'function') {
-    return fs.write(fd, buffer, a, b, c, callback)
-  }
-
-  // Check for old, depricated fs.write(fd, string[, position[, encoding]], callback)
-  if (typeof buffer === 'string') {
-    return new Promise((resolve, reject) => {
-      fs.write(fd, buffer, a, b, (err, bytesWritten, buffer) => {
-        if (err) return reject(err)
-        resolve({ bytesWritten, buffer })
-      })
-    })
-  }
-
-  return new Promise((resolve, reject) => {
-    fs.write(fd, buffer, a, b, c, (err, bytesWritten, buffer) => {
-      if (err) return reject(err)
-      resolve({ bytesWritten, buffer })
-    })
-  })
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const assign = __webpack_require__("./node_modules/fs-extra/lib/util/assign.js")
-
-const fs = {}
-
-// Export graceful-fs:
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/fs/index.js"))
-// Export extra methods:
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/copy/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/copy-sync/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/remove/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/json/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/move/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/move-sync/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/empty/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/ensure/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/output/index.js"))
-assign(fs, __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js"))
-
-module.exports = fs
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/json/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const jsonFile = __webpack_require__("./node_modules/fs-extra/lib/json/jsonfile.js")
-
-jsonFile.outputJson = u(__webpack_require__("./node_modules/fs-extra/lib/json/output-json.js"))
-jsonFile.outputJsonSync = __webpack_require__("./node_modules/fs-extra/lib/json/output-json-sync.js")
-// aliases
-jsonFile.outputJSON = jsonFile.outputJson
-jsonFile.outputJSONSync = jsonFile.outputJsonSync
-jsonFile.writeJSON = jsonFile.writeJson
-jsonFile.writeJSONSync = jsonFile.writeJsonSync
-jsonFile.readJSON = jsonFile.readJson
-jsonFile.readJSONSync = jsonFile.readJsonSync
-
-module.exports = jsonFile
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/json/jsonfile.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const jsonFile = __webpack_require__("./node_modules/fs-extra/node_modules/jsonfile/index.js")
-
-module.exports = {
-  // jsonfile exports
-  readJson: u(jsonFile.readFile),
-  readJsonSync: jsonFile.readFileSync,
-  writeJson: u(jsonFile.writeFile),
-  writeJsonSync: jsonFile.writeFileSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/json/output-json-sync.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const mkdir = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const jsonFile = __webpack_require__("./node_modules/fs-extra/lib/json/jsonfile.js")
-
-function outputJsonSync (file, data, options) {
-  const dir = path.dirname(file)
-
-  if (!fs.existsSync(dir)) {
-    mkdir.mkdirsSync(dir)
-  }
-
-  jsonFile.writeJsonSync(file, data, options)
-}
-
-module.exports = outputJsonSync
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/json/output-json.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const path = __webpack_require__("path")
-const mkdir = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-const jsonFile = __webpack_require__("./node_modules/fs-extra/lib/json/jsonfile.js")
-
-function outputJson (file, data, options, callback) {
-  if (typeof options === 'function') {
-    callback = options
-    options = {}
-  }
-
-  const dir = path.dirname(file)
-
-  pathExists(dir, (err, itDoes) => {
-    if (err) return callback(err)
-    if (itDoes) return jsonFile.writeJson(file, data, options, callback)
-
-    mkdir.mkdirs(dir, err => {
-      if (err) return callback(err)
-      jsonFile.writeJson(file, data, options, callback)
-    })
-  })
-}
-
-module.exports = outputJson
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/mkdirs/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const mkdirs = u(__webpack_require__("./node_modules/fs-extra/lib/mkdirs/mkdirs.js"))
-const mkdirsSync = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/mkdirs-sync.js")
-
-module.exports = {
-  mkdirs: mkdirs,
-  mkdirsSync: mkdirsSync,
-  // alias
-  mkdirp: mkdirs,
-  mkdirpSync: mkdirsSync,
-  ensureDir: mkdirs,
-  ensureDirSync: mkdirsSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/mkdirs/mkdirs-sync.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const invalidWin32Path = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/win32.js").invalidWin32Path
-
-const o777 = parseInt('0777', 8)
-
-function mkdirsSync (p, opts, made) {
-  if (!opts || typeof opts !== 'object') {
-    opts = { mode: opts }
-  }
-
-  let mode = opts.mode
-  const xfs = opts.fs || fs
-
-  if (process.platform === 'win32' && invalidWin32Path(p)) {
-    const errInval = new Error(p + ' contains invalid WIN32 path characters.')
-    errInval.code = 'EINVAL'
-    throw errInval
-  }
-
-  if (mode === undefined) {
-    mode = o777 & (~process.umask())
-  }
-  if (!made) made = null
-
-  p = path.resolve(p)
-
-  try {
-    xfs.mkdirSync(p, mode)
-    made = made || p
-  } catch (err0) {
-    switch (err0.code) {
-      case 'ENOENT':
-        if (path.dirname(p) === p) throw err0
-        made = mkdirsSync(path.dirname(p), opts, made)
-        mkdirsSync(p, opts, made)
-        break
-
-      // In the case of any other error, just see if there's a dir
-      // there already.  If so, then hooray!  If not, then something
-      // is borked.
-      default:
-        let stat
-        try {
-          stat = xfs.statSync(p)
-        } catch (err1) {
-          throw err0
-        }
-        if (!stat.isDirectory()) throw err0
-        break
-    }
-  }
-
-  return made
-}
-
-module.exports = mkdirsSync
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/mkdirs/mkdirs.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const invalidWin32Path = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/win32.js").invalidWin32Path
-
-const o777 = parseInt('0777', 8)
-
-function mkdirs (p, opts, callback, made) {
-  if (typeof opts === 'function') {
-    callback = opts
-    opts = {}
-  } else if (!opts || typeof opts !== 'object') {
-    opts = { mode: opts }
-  }
-
-  if (process.platform === 'win32' && invalidWin32Path(p)) {
-    const errInval = new Error(p + ' contains invalid WIN32 path characters.')
-    errInval.code = 'EINVAL'
-    return callback(errInval)
-  }
-
-  let mode = opts.mode
-  const xfs = opts.fs || fs
-
-  if (mode === undefined) {
-    mode = o777 & (~process.umask())
-  }
-  if (!made) made = null
-
-  callback = callback || function () {}
-  p = path.resolve(p)
-
-  xfs.mkdir(p, mode, er => {
-    if (!er) {
-      made = made || p
-      return callback(null, made)
-    }
-    switch (er.code) {
-      case 'ENOENT':
-        if (path.dirname(p) === p) return callback(er)
-        mkdirs(path.dirname(p), opts, (er, made) => {
-          if (er) callback(er, made)
-          else mkdirs(p, opts, callback, made)
-        })
-        break
-
-      // In the case of any other error, just see if there's a dir
-      // there already.  If so, then hooray!  If not, then something
-      // is borked.
-      default:
-        xfs.stat(p, (er2, stat) => {
-          // if the stat fails, then that's super weird.
-          // let the original error be the failure reason.
-          if (er2 || !stat.isDirectory()) callback(er, made)
-          else callback(null, made)
-        })
-        break
-    }
-  })
-}
-
-module.exports = mkdirs
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/mkdirs/win32.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const path = __webpack_require__("path")
-
-// get drive on windows
-function getRootPath (p) {
-  p = path.normalize(path.resolve(p)).split(path.sep)
-  if (p.length > 0) return p[0]
-  return null
-}
-
-// http://stackoverflow.com/a/62888/10333 contains more accurate
-// TODO: expand to include the rest
-const INVALID_PATH_CHARS = /[<>:"|?*]/
-
-function invalidWin32Path (p) {
-  const rp = getRootPath(p)
-  p = p.replace(rp, '')
-  return INVALID_PATH_CHARS.test(p)
-}
-
-module.exports = {
-  getRootPath,
-  invalidWin32Path
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/move-sync/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const copySync = __webpack_require__("./node_modules/fs-extra/lib/copy-sync/index.js").copySync
-const removeSync = __webpack_require__("./node_modules/fs-extra/lib/remove/index.js").removeSync
-const mkdirpSync = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js").mkdirsSync
-const buffer = __webpack_require__("./node_modules/fs-extra/lib/util/buffer.js")
-
-function moveSync (src, dest, options) {
-  options = options || {}
-  const overwrite = options.overwrite || options.clobber || false
-
-  src = path.resolve(src)
-  dest = path.resolve(dest)
-
-  if (src === dest) return fs.accessSync(src)
-
-  if (isSrcSubdir(src, dest)) throw new Error(`Cannot move '${src}' into itself '${dest}'.`)
-
-  mkdirpSync(path.dirname(dest))
-  tryRenameSync()
-
-  function tryRenameSync () {
-    if (overwrite) {
-      try {
-        return fs.renameSync(src, dest)
-      } catch (err) {
-        if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST' || err.code === 'EPERM') {
-          removeSync(dest)
-          options.overwrite = false // just overwriteed it, no need to do it again
-          return moveSync(src, dest, options)
-        }
-
-        if (err.code !== 'EXDEV') throw err
-        return moveSyncAcrossDevice(src, dest, overwrite)
-      }
-    } else {
-      try {
-        fs.linkSync(src, dest)
-        return fs.unlinkSync(src)
-      } catch (err) {
-        if (err.code === 'EXDEV' || err.code === 'EISDIR' || err.code === 'EPERM' || err.code === 'ENOTSUP') {
-          return moveSyncAcrossDevice(src, dest, overwrite)
-        }
-        throw err
-      }
-    }
-  }
-}
-
-function moveSyncAcrossDevice (src, dest, overwrite) {
-  const stat = fs.statSync(src)
-
-  if (stat.isDirectory()) {
-    return moveDirSyncAcrossDevice(src, dest, overwrite)
-  } else {
-    return moveFileSyncAcrossDevice(src, dest, overwrite)
-  }
-}
-
-function moveFileSyncAcrossDevice (src, dest, overwrite) {
-  const BUF_LENGTH = 64 * 1024
-  const _buff = buffer(BUF_LENGTH)
-
-  const flags = overwrite ? 'w' : 'wx'
-
-  const fdr = fs.openSync(src, 'r')
-  const stat = fs.fstatSync(fdr)
-  const fdw = fs.openSync(dest, flags, stat.mode)
-  let bytesRead = 1
-  let pos = 0
-
-  while (bytesRead > 0) {
-    bytesRead = fs.readSync(fdr, _buff, 0, BUF_LENGTH, pos)
-    fs.writeSync(fdw, _buff, 0, bytesRead)
-    pos += bytesRead
-  }
-
-  fs.closeSync(fdr)
-  fs.closeSync(fdw)
-  return fs.unlinkSync(src)
-}
-
-function moveDirSyncAcrossDevice (src, dest, overwrite) {
-  const options = {
-    overwrite: false
-  }
-
-  if (overwrite) {
-    removeSync(dest)
-    tryCopySync()
-  } else {
-    tryCopySync()
-  }
-
-  function tryCopySync () {
-    copySync(src, dest, options)
-    return removeSync(src)
-  }
-}
-
-// return true if dest is a subdir of src, otherwise false.
-// extract dest base dir and check if that is the same as src basename
-function isSrcSubdir (src, dest) {
-  try {
-    return fs.statSync(src).isDirectory() &&
-           src !== dest &&
-           dest.indexOf(src) > -1 &&
-           dest.split(path.dirname(src) + path.sep)[1].split(path.sep)[0] === path.basename(src)
-  } catch (e) {
-    return false
-  }
-}
-
-module.exports = {
-  moveSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/move/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// most of this code was written by Andrew Kelley
-// licensed under the BSD license: see
-// https://github.com/andrewrk/node-mv/blob/master/package.json
-
-// this needs a cleanup
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const copy = __webpack_require__("./node_modules/fs-extra/lib/copy/copy.js")
-const path = __webpack_require__("path")
-const remove = __webpack_require__("./node_modules/fs-extra/lib/remove/index.js").remove
-const mkdirp = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js").mkdirs
-
-function move (src, dest, options, callback) {
-  if (typeof options === 'function') {
-    callback = options
-    options = {}
-  }
-
-  const overwrite = options.overwrite || options.clobber || false
-
-  isSrcSubdir(src, dest, (err, itIs) => {
-    if (err) return callback(err)
-    if (itIs) return callback(new Error(`Cannot move '${src}' to a subdirectory of itself, '${dest}'.`))
-    mkdirp(path.dirname(dest), err => {
-      if (err) return callback(err)
-      doRename()
-    })
-  })
-
-  function doRename () {
-    if (path.resolve(src) === path.resolve(dest)) {
-      fs.access(src, callback)
-    } else if (overwrite) {
-      fs.rename(src, dest, err => {
-        if (!err) return callback()
-
-        if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST') {
-          remove(dest, err => {
-            if (err) return callback(err)
-            options.overwrite = false // just overwriteed it, no need to do it again
-            move(src, dest, options, callback)
-          })
-          return
-        }
-
-        // weird Windows shit
-        if (err.code === 'EPERM') {
-          setTimeout(() => {
-            remove(dest, err => {
-              if (err) return callback(err)
-              options.overwrite = false
-              move(src, dest, options, callback)
-            })
-          }, 200)
-          return
-        }
-
-        if (err.code !== 'EXDEV') return callback(err)
-        moveAcrossDevice(src, dest, overwrite, callback)
-      })
-    } else {
-      fs.link(src, dest, err => {
-        if (err) {
-          if (err.code === 'EXDEV' || err.code === 'EISDIR' || err.code === 'EPERM' || err.code === 'ENOTSUP') {
-            return moveAcrossDevice(src, dest, overwrite, callback)
-          }
-          return callback(err)
-        }
-        return fs.unlink(src, callback)
-      })
-    }
-  }
-}
-
-function moveAcrossDevice (src, dest, overwrite, callback) {
-  fs.stat(src, (err, stat) => {
-    if (err) return callback(err)
-
-    if (stat.isDirectory()) {
-      moveDirAcrossDevice(src, dest, overwrite, callback)
-    } else {
-      moveFileAcrossDevice(src, dest, overwrite, callback)
-    }
-  })
-}
-
-function moveFileAcrossDevice (src, dest, overwrite, callback) {
-  const flags = overwrite ? 'w' : 'wx'
-  const ins = fs.createReadStream(src)
-  const outs = fs.createWriteStream(dest, { flags })
-
-  ins.on('error', err => {
-    ins.destroy()
-    outs.destroy()
-    outs.removeListener('close', onClose)
-
-    // may want to create a directory but `out` line above
-    // creates an empty file for us: See #108
-    // don't care about error here
-    fs.unlink(dest, () => {
-      // note: `err` here is from the input stream errror
-      if (err.code === 'EISDIR' || err.code === 'EPERM') {
-        moveDirAcrossDevice(src, dest, overwrite, callback)
-      } else {
-        callback(err)
-      }
-    })
-  })
-
-  outs.on('error', err => {
-    ins.destroy()
-    outs.destroy()
-    outs.removeListener('close', onClose)
-    callback(err)
-  })
-
-  outs.once('close', onClose)
-  ins.pipe(outs)
-
-  function onClose () {
-    fs.unlink(src, callback)
-  }
-}
-
-function moveDirAcrossDevice (src, dest, overwrite, callback) {
-  const options = {
-    overwrite: false
-  }
-
-  if (overwrite) {
-    remove(dest, err => {
-      if (err) return callback(err)
-      startCopy()
-    })
-  } else {
-    startCopy()
-  }
-
-  function startCopy () {
-    copy(src, dest, options, err => {
-      if (err) return callback(err)
-      remove(src, callback)
-    })
-  }
-}
-
-// return true if dest is a subdir of src, otherwise false.
-// extract dest base dir and check if that is the same as src basename
-function isSrcSubdir (src, dest, cb) {
-  fs.stat(src, (err, st) => {
-    if (err) return cb(err)
-    if (st.isDirectory()) {
-      const baseDir = dest.split(path.dirname(src) + path.sep)[1]
-      if (baseDir) {
-        const destBasename = baseDir.split(path.sep)[0]
-        if (destBasename) return cb(null, src !== dest && dest.indexOf(src) > -1 && destBasename === path.basename(src))
-        return cb(null, false)
-      }
-      return cb(null, false)
-    }
-    return cb(null, false)
-  })
-}
-
-module.exports = {
-  move: u(move)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/output/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const mkdir = __webpack_require__("./node_modules/fs-extra/lib/mkdirs/index.js")
-const pathExists = __webpack_require__("./node_modules/fs-extra/lib/path-exists/index.js").pathExists
-
-function outputFile (file, data, encoding, callback) {
-  if (typeof encoding === 'function') {
-    callback = encoding
-    encoding = 'utf8'
-  }
-
-  const dir = path.dirname(file)
-  pathExists(dir, (err, itDoes) => {
-    if (err) return callback(err)
-    if (itDoes) return fs.writeFile(file, data, encoding, callback)
-
-    mkdir.mkdirs(dir, err => {
-      if (err) return callback(err)
-
-      fs.writeFile(file, data, encoding, callback)
-    })
-  })
-}
-
-function outputFileSync (file, data, encoding) {
-  const dir = path.dirname(file)
-  if (fs.existsSync(dir)) {
-    return fs.writeFileSync.apply(fs, arguments)
-  }
-  mkdir.mkdirsSync(dir)
-  fs.writeFileSync.apply(fs, arguments)
-}
-
-module.exports = {
-  outputFile: u(outputFile),
-  outputFileSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/path-exists/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromPromise
-const fs = __webpack_require__("./node_modules/fs-extra/lib/fs/index.js")
-
-function pathExists (path) {
-  return fs.access(path).then(() => true).catch(() => false)
-}
-
-module.exports = {
-  pathExists: u(pathExists),
-  pathExistsSync: fs.existsSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/remove/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const u = __webpack_require__("./node_modules/universalify/index.js").fromCallback
-const rimraf = __webpack_require__("./node_modules/fs-extra/lib/remove/rimraf.js")
-
-module.exports = {
-  remove: u(rimraf),
-  removeSync: rimraf.sync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/remove/rimraf.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const path = __webpack_require__("path")
-const assert = __webpack_require__("assert")
-
-const isWindows = (process.platform === 'win32')
-
-function defaults (options) {
-  const methods = [
-    'unlink',
-    'chmod',
-    'stat',
-    'lstat',
-    'rmdir',
-    'readdir'
-  ]
-  methods.forEach(m => {
-    options[m] = options[m] || fs[m]
-    m = m + 'Sync'
-    options[m] = options[m] || fs[m]
-  })
-
-  options.maxBusyTries = options.maxBusyTries || 3
-}
-
-function rimraf (p, options, cb) {
-  let busyTries = 0
-
-  if (typeof options === 'function') {
-    cb = options
-    options = {}
-  }
-
-  assert(p, 'rimraf: missing path')
-  assert.equal(typeof p, 'string', 'rimraf: path should be a string')
-  assert.equal(typeof cb, 'function', 'rimraf: callback function required')
-  assert(options, 'rimraf: invalid options argument provided')
-  assert.equal(typeof options, 'object', 'rimraf: options should be object')
-
-  defaults(options)
-
-  rimraf_(p, options, function CB (er) {
-    if (er) {
-      if ((er.code === 'EBUSY' || er.code === 'ENOTEMPTY' || er.code === 'EPERM') &&
-          busyTries < options.maxBusyTries) {
-        busyTries++
-        let time = busyTries * 100
-        // try again, with the same exact callback as this one.
-        return setTimeout(() => rimraf_(p, options, CB), time)
-      }
-
-      // already gone
-      if (er.code === 'ENOENT') er = null
-    }
-
-    cb(er)
-  })
-}
-
-// Two possible strategies.
-// 1. Assume it's a file.  unlink it, then do the dir stuff on EPERM or EISDIR
-// 2. Assume it's a directory.  readdir, then do the file stuff on ENOTDIR
-//
-// Both result in an extra syscall when you guess wrong.  However, there
-// are likely far more normal files in the world than directories.  This
-// is based on the assumption that a the average number of files per
-// directory is >= 1.
-//
-// If anyone ever complains about this, then I guess the strategy could
-// be made configurable somehow.  But until then, YAGNI.
-function rimraf_ (p, options, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  // sunos lets the root user unlink directories, which is... weird.
-  // so we have to lstat here and make sure it's not a dir.
-  options.lstat(p, (er, st) => {
-    if (er && er.code === 'ENOENT') {
-      return cb(null)
-    }
-
-    // Windows can EPERM on stat.  Life is suffering.
-    if (er && er.code === 'EPERM' && isWindows) {
-      return fixWinEPERM(p, options, er, cb)
-    }
-
-    if (st && st.isDirectory()) {
-      return rmdir(p, options, er, cb)
-    }
-
-    options.unlink(p, er => {
-      if (er) {
-        if (er.code === 'ENOENT') {
-          return cb(null)
-        }
-        if (er.code === 'EPERM') {
-          return (isWindows)
-            ? fixWinEPERM(p, options, er, cb)
-            : rmdir(p, options, er, cb)
-        }
-        if (er.code === 'EISDIR') {
-          return rmdir(p, options, er, cb)
-        }
-      }
-      return cb(er)
-    })
-  })
-}
-
-function fixWinEPERM (p, options, er, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-  if (er) {
-    assert(er instanceof Error)
-  }
-
-  options.chmod(p, 0o666, er2 => {
-    if (er2) {
-      cb(er2.code === 'ENOENT' ? null : er)
-    } else {
-      options.stat(p, (er3, stats) => {
-        if (er3) {
-          cb(er3.code === 'ENOENT' ? null : er)
-        } else if (stats.isDirectory()) {
-          rmdir(p, options, er, cb)
-        } else {
-          options.unlink(p, cb)
-        }
-      })
-    }
-  })
-}
-
-function fixWinEPERMSync (p, options, er) {
-  let stats
-
-  assert(p)
-  assert(options)
-  if (er) {
-    assert(er instanceof Error)
-  }
-
-  try {
-    options.chmodSync(p, 0o666)
-  } catch (er2) {
-    if (er2.code === 'ENOENT') {
-      return
-    } else {
-      throw er
-    }
-  }
-
-  try {
-    stats = options.statSync(p)
-  } catch (er3) {
-    if (er3.code === 'ENOENT') {
-      return
-    } else {
-      throw er
-    }
-  }
-
-  if (stats.isDirectory()) {
-    rmdirSync(p, options, er)
-  } else {
-    options.unlinkSync(p)
-  }
-}
-
-function rmdir (p, options, originalEr, cb) {
-  assert(p)
-  assert(options)
-  if (originalEr) {
-    assert(originalEr instanceof Error)
-  }
-  assert(typeof cb === 'function')
-
-  // try to rmdir first, and only readdir on ENOTEMPTY or EEXIST (SunOS)
-  // if we guessed wrong, and it's not a directory, then
-  // raise the original error.
-  options.rmdir(p, er => {
-    if (er && (er.code === 'ENOTEMPTY' || er.code === 'EEXIST' || er.code === 'EPERM')) {
-      rmkids(p, options, cb)
-    } else if (er && er.code === 'ENOTDIR') {
-      cb(originalEr)
-    } else {
-      cb(er)
-    }
-  })
-}
-
-function rmkids (p, options, cb) {
-  assert(p)
-  assert(options)
-  assert(typeof cb === 'function')
-
-  options.readdir(p, (er, files) => {
-    if (er) return cb(er)
-
-    let n = files.length
-    let errState
-
-    if (n === 0) return options.rmdir(p, cb)
-
-    files.forEach(f => {
-      rimraf(path.join(p, f), options, er => {
-        if (errState) {
-          return
-        }
-        if (er) return cb(errState = er)
-        if (--n === 0) {
-          options.rmdir(p, cb)
-        }
-      })
-    })
-  })
-}
-
-// this looks simpler, and is strictly *faster*, but will
-// tie up the JavaScript thread and fail on excessively
-// deep directory trees.
-function rimrafSync (p, options) {
-  let st
-
-  options = options || {}
-  defaults(options)
-
-  assert(p, 'rimraf: missing path')
-  assert.equal(typeof p, 'string', 'rimraf: path should be a string')
-  assert(options, 'rimraf: missing options')
-  assert.equal(typeof options, 'object', 'rimraf: options should be object')
-
-  try {
-    st = options.lstatSync(p)
-  } catch (er) {
-    if (er.code === 'ENOENT') {
-      return
-    }
-
-    // Windows can EPERM on stat.  Life is suffering.
-    if (er.code === 'EPERM' && isWindows) {
-      fixWinEPERMSync(p, options, er)
-    }
-  }
-
-  try {
-    // sunos lets the root user unlink directories, which is... weird.
-    if (st && st.isDirectory()) {
-      rmdirSync(p, options, null)
-    } else {
-      options.unlinkSync(p)
-    }
-  } catch (er) {
-    if (er.code === 'ENOENT') {
-      return
-    } else if (er.code === 'EPERM') {
-      return isWindows ? fixWinEPERMSync(p, options, er) : rmdirSync(p, options, er)
-    } else if (er.code !== 'EISDIR') {
-      throw er
-    }
-    rmdirSync(p, options, er)
-  }
-}
-
-function rmdirSync (p, options, originalEr) {
-  assert(p)
-  assert(options)
-  if (originalEr) {
-    assert(originalEr instanceof Error)
-  }
-
-  try {
-    options.rmdirSync(p)
-  } catch (er) {
-    if (er.code === 'ENOTDIR') {
-      throw originalEr
-    } else if (er.code === 'ENOTEMPTY' || er.code === 'EEXIST' || er.code === 'EPERM') {
-      rmkidsSync(p, options)
-    } else if (er.code !== 'ENOENT') {
-      throw er
-    }
-  }
-}
-
-function rmkidsSync (p, options) {
-  assert(p)
-  assert(options)
-  options.readdirSync(p).forEach(f => rimrafSync(path.join(p, f), options))
-
-  // We only end up here once we got ENOTEMPTY at least once, and
-  // at this point, we are guaranteed to have removed all the kids.
-  // So, we know that it won't be ENOENT or ENOTDIR or anything else.
-  // try really hard to delete stuff on windows, because it has a
-  // PROFOUNDLY annoying habit of not closing handles promptly when
-  // files are deleted, resulting in spurious ENOTEMPTY errors.
-  const retries = isWindows ? 100 : 1
-  let i = 0
-  do {
-    let threw = true
-    try {
-      const ret = options.rmdirSync(p, options)
-      threw = false
-      return ret
-    } finally {
-      if (++i < retries && threw) continue // eslint-disable-line
-    }
-  } while (true)
-}
-
-module.exports = rimraf
-rimraf.sync = rimrafSync
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/util/assign.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// simple mutable assign
-function assign () {
-  const args = [].slice.call(arguments).filter(i => i)
-  const dest = args.shift()
-  args.forEach(src => {
-    Object.keys(src).forEach(key => {
-      dest[key] = src[key]
-    })
-  })
-
-  return dest
-}
-
-module.exports = assign
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/util/buffer.js":
-/***/ (function(module, exports) {
-
-/* eslint-disable node/no-deprecated-api */
-module.exports = function (size) {
-  if (typeof Buffer.allocUnsafe === 'function') {
-    try {
-      return Buffer.allocUnsafe(size)
-    } catch (e) {
-      return new Buffer(size)
-    }
-  }
-  return new Buffer(size)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/lib/util/utimes.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-const os = __webpack_require__("os")
-const path = __webpack_require__("path")
-
-// HFS, ext{2,3}, FAT do not, Node.js v0.10 does not
-function hasMillisResSync () {
-  let tmpfile = path.join('millis-test-sync' + Date.now().toString() + Math.random().toString().slice(2))
-  tmpfile = path.join(os.tmpdir(), tmpfile)
-
-  // 550 millis past UNIX epoch
-  const d = new Date(1435410243862)
-  fs.writeFileSync(tmpfile, 'https://github.com/jprichardson/node-fs-extra/pull/141')
-  const fd = fs.openSync(tmpfile, 'r+')
-  fs.futimesSync(fd, d, d)
-  fs.closeSync(fd)
-  return fs.statSync(tmpfile).mtime > 1435410243000
-}
-
-function hasMillisRes (callback) {
-  let tmpfile = path.join('millis-test' + Date.now().toString() + Math.random().toString().slice(2))
-  tmpfile = path.join(os.tmpdir(), tmpfile)
-
-  // 550 millis past UNIX epoch
-  const d = new Date(1435410243862)
-  fs.writeFile(tmpfile, 'https://github.com/jprichardson/node-fs-extra/pull/141', err => {
-    if (err) return callback(err)
-    fs.open(tmpfile, 'r+', (err, fd) => {
-      if (err) return callback(err)
-      fs.futimes(fd, d, d, err => {
-        if (err) return callback(err)
-        fs.close(fd, err => {
-          if (err) return callback(err)
-          fs.stat(tmpfile, (err, stats) => {
-            if (err) return callback(err)
-            callback(null, stats.mtime > 1435410243000)
-          })
-        })
-      })
-    })
-  })
-}
-
-function timeRemoveMillis (timestamp) {
-  if (typeof timestamp === 'number') {
-    return Math.floor(timestamp / 1000) * 1000
-  } else if (timestamp instanceof Date) {
-    return new Date(Math.floor(timestamp.getTime() / 1000) * 1000)
-  } else {
-    throw new Error('fs-extra: timeRemoveMillis() unknown parameter type')
-  }
-}
-
-function utimesMillis (path, atime, mtime, callback) {
-  // if (!HAS_MILLIS_RES) return fs.utimes(path, atime, mtime, callback)
-  fs.open(path, 'r+', (err, fd) => {
-    if (err) return callback(err)
-    fs.futimes(fd, atime, mtime, futimesErr => {
-      fs.close(fd, closeErr => {
-        if (callback) callback(futimesErr || closeErr)
-      })
-    })
-  })
-}
-
-function utimesMillisSync (path, atime, mtime) {
-  const fd = fs.openSync(path, 'r+')
-  fs.futimesSync(fd, atime, mtime)
-  return fs.closeSync(fd)
-}
-
-module.exports = {
-  hasMillisRes,
-  hasMillisResSync,
-  timeRemoveMillis,
-  utimesMillis,
-  utimesMillisSync
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/fs-extra/node_modules/jsonfile/index.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-var _fs
-try {
-  _fs = __webpack_require__("./node_modules/graceful-fs/graceful-fs.js")
-} catch (_) {
-  _fs = __webpack_require__("fs")
-}
-
-function readFile (file, options, callback) {
-  if (callback == null) {
-    callback = options
-    options = {}
-  }
-
-  if (typeof options === 'string') {
-    options = {encoding: options}
-  }
-
-  options = options || {}
-  var fs = options.fs || _fs
-
-  var shouldThrow = true
-  if ('throws' in options) {
-    shouldThrow = options.throws
-  }
-
-  fs.readFile(file, options, function (err, data) {
-    if (err) return callback(err)
-
-    data = stripBom(data)
-
-    var obj
-    try {
-      obj = JSON.parse(data, options ? options.reviver : null)
-    } catch (err2) {
-      if (shouldThrow) {
-        err2.message = file + ': ' + err2.message
-        return callback(err2)
-      } else {
-        return callback(null, null)
-      }
-    }
-
-    callback(null, obj)
-  })
-}
-
-function readFileSync (file, options) {
-  options = options || {}
-  if (typeof options === 'string') {
-    options = {encoding: options}
-  }
-
-  var fs = options.fs || _fs
-
-  var shouldThrow = true
-  if ('throws' in options) {
-    shouldThrow = options.throws
-  }
-
-  try {
-    var content = fs.readFileSync(file, options)
-    content = stripBom(content)
-    return JSON.parse(content, options.reviver)
-  } catch (err) {
-    if (shouldThrow) {
-      err.message = file + ': ' + err.message
-      throw err
-    } else {
-      return null
-    }
-  }
-}
-
-function stringify (obj, options) {
-  var spaces
-  var EOL = '\n'
-  if (typeof options === 'object' && options !== null) {
-    if (options.spaces) {
-      spaces = options.spaces
-    }
-    if (options.EOL) {
-      EOL = options.EOL
-    }
-  }
-
-  var str = JSON.stringify(obj, options ? options.replacer : null, spaces)
-
-  return str.replace(/\n/g, EOL) + EOL
-}
-
-function writeFile (file, obj, options, callback) {
-  if (callback == null) {
-    callback = options
-    options = {}
-  }
-  options = options || {}
-  var fs = options.fs || _fs
-
-  var str = ''
-  try {
-    str = stringify(obj, options)
-  } catch (err) {
-    // Need to return whether a callback was passed or not
-    if (callback) callback(err, null)
-    return
-  }
-
-  fs.writeFile(file, str, options, callback)
-}
-
-function writeFileSync (file, obj, options) {
-  options = options || {}
-  var fs = options.fs || _fs
-
-  var str = stringify(obj, options)
-  // not sure if fs.writeFileSync returns anything, but just in case
-  return fs.writeFileSync(file, str, options)
-}
-
-function stripBom (content) {
-  // we do this because JSON.parse would convert it to a utf8 string if encoding wasn't specified
-  if (Buffer.isBuffer(content)) content = content.toString('utf8')
-  content = content.replace(/^\uFEFF/, '')
-  return content
-}
-
-var jsonfile = {
-  readFile: readFile,
-  readFileSync: readFileSync,
-  writeFile: writeFile,
-  writeFileSync: writeFileSync
-}
-
-module.exports = jsonfile
-
-
-/***/ }),
-
-/***/ "./node_modules/graceful-fs/fs.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var fs = __webpack_require__("fs")
-
-module.exports = clone(fs)
-
-function clone (obj) {
-  if (obj === null || typeof obj !== 'object')
-    return obj
-
-  if (obj instanceof Object)
-    var copy = { __proto__: obj.__proto__ }
-  else
-    var copy = Object.create(null)
-
-  Object.getOwnPropertyNames(obj).forEach(function (key) {
-    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
-  })
-
-  return copy
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/graceful-fs/graceful-fs.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-var fs = __webpack_require__("fs")
-var polyfills = __webpack_require__("./node_modules/graceful-fs/polyfills.js")
-var legacy = __webpack_require__("./node_modules/graceful-fs/legacy-streams.js")
-var queue = []
-
-var util = __webpack_require__("util")
-
-function noop () {}
-
-var debug = noop
-if (util.debuglog)
-  debug = util.debuglog('gfs4')
-else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || ''))
-  debug = function() {
-    var m = util.format.apply(util, arguments)
-    m = 'GFS4: ' + m.split(/\n/).join('\nGFS4: ')
-    console.error(m)
-  }
-
-if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
-  process.on('exit', function() {
-    debug(queue)
-    __webpack_require__("assert").equal(queue.length, 0)
-  })
-}
-
-module.exports = patch(__webpack_require__("./node_modules/graceful-fs/fs.js"))
-if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH) {
-  module.exports = patch(fs)
-}
-
-// Always patch fs.close/closeSync, because we want to
-// retry() whenever a close happens *anywhere* in the program.
-// This is essential when multiple graceful-fs instances are
-// in play at the same time.
-module.exports.close =
-fs.close = (function (fs$close) { return function (fd, cb) {
-  return fs$close.call(fs, fd, function (err) {
-    if (!err)
-      retry()
-
-    if (typeof cb === 'function')
-      cb.apply(this, arguments)
-  })
-}})(fs.close)
-
-module.exports.closeSync =
-fs.closeSync = (function (fs$closeSync) { return function (fd) {
-  // Note that graceful-fs also retries when fs.closeSync() fails.
-  // Looks like a bug to me, although it's probably a harmless one.
-  var rval = fs$closeSync.apply(fs, arguments)
-  retry()
-  return rval
-}})(fs.closeSync)
-
-function patch (fs) {
-  // Everything that references the open() function needs to be in here
-  polyfills(fs)
-  fs.gracefulify = patch
-  fs.FileReadStream = ReadStream;  // Legacy name.
-  fs.FileWriteStream = WriteStream;  // Legacy name.
-  fs.createReadStream = createReadStream
-  fs.createWriteStream = createWriteStream
-  var fs$readFile = fs.readFile
-  fs.readFile = readFile
-  function readFile (path, options, cb) {
-    if (typeof options === 'function')
-      cb = options, options = null
-
-    return go$readFile(path, options, cb)
-
-    function go$readFile (path, options, cb) {
-      return fs$readFile(path, options, function (err) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$readFile, [path, options, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  var fs$writeFile = fs.writeFile
-  fs.writeFile = writeFile
-  function writeFile (path, data, options, cb) {
-    if (typeof options === 'function')
-      cb = options, options = null
-
-    return go$writeFile(path, data, options, cb)
-
-    function go$writeFile (path, data, options, cb) {
-      return fs$writeFile(path, data, options, function (err) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$writeFile, [path, data, options, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  var fs$appendFile = fs.appendFile
-  if (fs$appendFile)
-    fs.appendFile = appendFile
-  function appendFile (path, data, options, cb) {
-    if (typeof options === 'function')
-      cb = options, options = null
-
-    return go$appendFile(path, data, options, cb)
-
-    function go$appendFile (path, data, options, cb) {
-      return fs$appendFile(path, data, options, function (err) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$appendFile, [path, data, options, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  var fs$readdir = fs.readdir
-  fs.readdir = readdir
-  function readdir (path, options, cb) {
-    var args = [path]
-    if (typeof options !== 'function') {
-      args.push(options)
-    } else {
-      cb = options
-    }
-    args.push(go$readdir$cb)
-
-    return go$readdir(args)
-
-    function go$readdir$cb (err, files) {
-      if (files && files.sort)
-        files.sort()
-
-      if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-        enqueue([go$readdir, [args]])
-      else {
-        if (typeof cb === 'function')
-          cb.apply(this, arguments)
-        retry()
-      }
-    }
-  }
-
-  function go$readdir (args) {
-    return fs$readdir.apply(fs, args)
-  }
-
-  if (process.version.substr(0, 4) === 'v0.8') {
-    var legStreams = legacy(fs)
-    ReadStream = legStreams.ReadStream
-    WriteStream = legStreams.WriteStream
-  }
-
-  var fs$ReadStream = fs.ReadStream
-  ReadStream.prototype = Object.create(fs$ReadStream.prototype)
-  ReadStream.prototype.open = ReadStream$open
-
-  var fs$WriteStream = fs.WriteStream
-  WriteStream.prototype = Object.create(fs$WriteStream.prototype)
-  WriteStream.prototype.open = WriteStream$open
-
-  fs.ReadStream = ReadStream
-  fs.WriteStream = WriteStream
-
-  function ReadStream (path, options) {
-    if (this instanceof ReadStream)
-      return fs$ReadStream.apply(this, arguments), this
-    else
-      return ReadStream.apply(Object.create(ReadStream.prototype), arguments)
-  }
-
-  function ReadStream$open () {
-    var that = this
-    open(that.path, that.flags, that.mode, function (err, fd) {
-      if (err) {
-        if (that.autoClose)
-          that.destroy()
-
-        that.emit('error', err)
-      } else {
-        that.fd = fd
-        that.emit('open', fd)
-        that.read()
-      }
-    })
-  }
-
-  function WriteStream (path, options) {
-    if (this instanceof WriteStream)
-      return fs$WriteStream.apply(this, arguments), this
-    else
-      return WriteStream.apply(Object.create(WriteStream.prototype), arguments)
-  }
-
-  function WriteStream$open () {
-    var that = this
-    open(that.path, that.flags, that.mode, function (err, fd) {
-      if (err) {
-        that.destroy()
-        that.emit('error', err)
-      } else {
-        that.fd = fd
-        that.emit('open', fd)
-      }
-    })
-  }
-
-  function createReadStream (path, options) {
-    return new ReadStream(path, options)
-  }
-
-  function createWriteStream (path, options) {
-    return new WriteStream(path, options)
-  }
-
-  var fs$open = fs.open
-  fs.open = open
-  function open (path, flags, mode, cb) {
-    if (typeof mode === 'function')
-      cb = mode, mode = null
-
-    return go$open(path, flags, mode, cb)
-
-    function go$open (path, flags, mode, cb) {
-      return fs$open(path, flags, mode, function (err, fd) {
-        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
-          enqueue([go$open, [path, flags, mode, cb]])
-        else {
-          if (typeof cb === 'function')
-            cb.apply(this, arguments)
-          retry()
-        }
-      })
-    }
-  }
-
-  return fs
-}
-
-function enqueue (elem) {
-  debug('ENQUEUE', elem[0].name, elem[1])
-  queue.push(elem)
-}
-
-function retry () {
-  var elem = queue.shift()
-  if (elem) {
-    debug('RETRY', elem[0].name, elem[1])
-    elem[0].apply(null, elem[1])
-  }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/graceful-fs/legacy-streams.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-var Stream = __webpack_require__("stream").Stream
-
-module.exports = legacy
-
-function legacy (fs) {
-  return {
-    ReadStream: ReadStream,
-    WriteStream: WriteStream
-  }
-
-  function ReadStream (path, options) {
-    if (!(this instanceof ReadStream)) return new ReadStream(path, options);
-
-    Stream.call(this);
-
-    var self = this;
-
-    this.path = path;
-    this.fd = null;
-    this.readable = true;
-    this.paused = false;
-
-    this.flags = 'r';
-    this.mode = 438; /*=0666*/
-    this.bufferSize = 64 * 1024;
-
-    options = options || {};
-
-    // Mixin options into this
-    var keys = Object.keys(options);
-    for (var index = 0, length = keys.length; index < length; index++) {
-      var key = keys[index];
-      this[key] = options[key];
-    }
-
-    if (this.encoding) this.setEncoding(this.encoding);
-
-    if (this.start !== undefined) {
-      if ('number' !== typeof this.start) {
-        throw TypeError('start must be a Number');
-      }
-      if (this.end === undefined) {
-        this.end = Infinity;
-      } else if ('number' !== typeof this.end) {
-        throw TypeError('end must be a Number');
-      }
-
-      if (this.start > this.end) {
-        throw new Error('start must be <= end');
-      }
-
-      this.pos = this.start;
-    }
-
-    if (this.fd !== null) {
-      process.nextTick(function() {
-        self._read();
-      });
-      return;
-    }
-
-    fs.open(this.path, this.flags, this.mode, function (err, fd) {
-      if (err) {
-        self.emit('error', err);
-        self.readable = false;
-        return;
-      }
-
-      self.fd = fd;
-      self.emit('open', fd);
-      self._read();
-    })
-  }
-
-  function WriteStream (path, options) {
-    if (!(this instanceof WriteStream)) return new WriteStream(path, options);
-
-    Stream.call(this);
-
-    this.path = path;
-    this.fd = null;
-    this.writable = true;
-
-    this.flags = 'w';
-    this.encoding = 'binary';
-    this.mode = 438; /*=0666*/
-    this.bytesWritten = 0;
-
-    options = options || {};
-
-    // Mixin options into this
-    var keys = Object.keys(options);
-    for (var index = 0, length = keys.length; index < length; index++) {
-      var key = keys[index];
-      this[key] = options[key];
-    }
-
-    if (this.start !== undefined) {
-      if ('number' !== typeof this.start) {
-        throw TypeError('start must be a Number');
-      }
-      if (this.start < 0) {
-        throw new Error('start must be >= zero');
-      }
-
-      this.pos = this.start;
-    }
-
-    this.busy = false;
-    this._queue = [];
-
-    if (this.fd === null) {
-      this._open = fs.open;
-      this._queue.push([this._open, this.path, this.flags, this.mode, undefined]);
-      this.flush();
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/graceful-fs/polyfills.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-var fs = __webpack_require__("./node_modules/graceful-fs/fs.js")
-var constants = __webpack_require__("constants")
-
-var origCwd = process.cwd
-var cwd = null
-
-var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform
-
-process.cwd = function() {
-  if (!cwd)
-    cwd = origCwd.call(process)
-  return cwd
-}
-try {
-  process.cwd()
-} catch (er) {}
-
-var chdir = process.chdir
-process.chdir = function(d) {
-  cwd = null
-  chdir.call(process, d)
-}
-
-module.exports = patch
-
-function patch (fs) {
-  // (re-)implement some things that are known busted or missing.
-
-  // lchmod, broken prior to 0.6.2
-  // back-port the fix here.
-  if (constants.hasOwnProperty('O_SYMLINK') &&
-      process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
-    patchLchmod(fs)
-  }
-
-  // lutimes implementation, or no-op
-  if (!fs.lutimes) {
-    patchLutimes(fs)
-  }
-
-  // https://github.com/isaacs/node-graceful-fs/issues/4
-  // Chown should not fail on einval or eperm if non-root.
-  // It should not fail on enosys ever, as this just indicates
-  // that a fs doesn't support the intended operation.
-
-  fs.chown = chownFix(fs.chown)
-  fs.fchown = chownFix(fs.fchown)
-  fs.lchown = chownFix(fs.lchown)
-
-  fs.chmod = chmodFix(fs.chmod)
-  fs.fchmod = chmodFix(fs.fchmod)
-  fs.lchmod = chmodFix(fs.lchmod)
-
-  fs.chownSync = chownFixSync(fs.chownSync)
-  fs.fchownSync = chownFixSync(fs.fchownSync)
-  fs.lchownSync = chownFixSync(fs.lchownSync)
-
-  fs.chmodSync = chmodFixSync(fs.chmodSync)
-  fs.fchmodSync = chmodFixSync(fs.fchmodSync)
-  fs.lchmodSync = chmodFixSync(fs.lchmodSync)
-
-  fs.stat = statFix(fs.stat)
-  fs.fstat = statFix(fs.fstat)
-  fs.lstat = statFix(fs.lstat)
-
-  fs.statSync = statFixSync(fs.statSync)
-  fs.fstatSync = statFixSync(fs.fstatSync)
-  fs.lstatSync = statFixSync(fs.lstatSync)
-
-  // if lchmod/lchown do not exist, then make them no-ops
-  if (!fs.lchmod) {
-    fs.lchmod = function (path, mode, cb) {
-      if (cb) process.nextTick(cb)
-    }
-    fs.lchmodSync = function () {}
-  }
-  if (!fs.lchown) {
-    fs.lchown = function (path, uid, gid, cb) {
-      if (cb) process.nextTick(cb)
-    }
-    fs.lchownSync = function () {}
-  }
-
-  // on Windows, A/V software can lock the directory, causing this
-  // to fail with an EACCES or EPERM if the directory contains newly
-  // created files.  Try again on failure, for up to 60 seconds.
-
-  // Set the timeout this long because some Windows Anti-Virus, such as Parity
-  // bit9, may lock files for up to a minute, causing npm package install
-  // failures. Also, take care to yield the scheduler. Windows scheduling gives
-  // CPU to a busy looping process, which can cause the program causing the lock
-  // contention to be starved of CPU by node, so the contention doesn't resolve.
-  if (platform === "win32") {
-    fs.rename = (function (fs$rename) { return function (from, to, cb) {
-      var start = Date.now()
-      var backoff = 0;
-      fs$rename(from, to, function CB (er) {
-        if (er
-            && (er.code === "EACCES" || er.code === "EPERM")
-            && Date.now() - start < 60000) {
-          setTimeout(function() {
-            fs.stat(to, function (stater, st) {
-              if (stater && stater.code === "ENOENT")
-                fs$rename(from, to, CB);
-              else
-                cb(er)
-            })
-          }, backoff)
-          if (backoff < 100)
-            backoff += 10;
-          return;
-        }
-        if (cb) cb(er)
-      })
-    }})(fs.rename)
-  }
-
-  // if read() returns EAGAIN, then just try it again.
-  fs.read = (function (fs$read) { return function (fd, buffer, offset, length, position, callback_) {
-    var callback
-    if (callback_ && typeof callback_ === 'function') {
-      var eagCounter = 0
-      callback = function (er, _, __) {
-        if (er && er.code === 'EAGAIN' && eagCounter < 10) {
-          eagCounter ++
-          return fs$read.call(fs, fd, buffer, offset, length, position, callback)
-        }
-        callback_.apply(this, arguments)
-      }
-    }
-    return fs$read.call(fs, fd, buffer, offset, length, position, callback)
-  }})(fs.read)
-
-  fs.readSync = (function (fs$readSync) { return function (fd, buffer, offset, length, position) {
-    var eagCounter = 0
-    while (true) {
-      try {
-        return fs$readSync.call(fs, fd, buffer, offset, length, position)
-      } catch (er) {
-        if (er.code === 'EAGAIN' && eagCounter < 10) {
-          eagCounter ++
-          continue
-        }
-        throw er
-      }
-    }
-  }})(fs.readSync)
-}
-
-function patchLchmod (fs) {
-  fs.lchmod = function (path, mode, callback) {
-    fs.open( path
-           , constants.O_WRONLY | constants.O_SYMLINK
-           , mode
-           , function (err, fd) {
-      if (err) {
-        if (callback) callback(err)
-        return
-      }
-      // prefer to return the chmod error, if one occurs,
-      // but still try to close, and report closing errors if they occur.
-      fs.fchmod(fd, mode, function (err) {
-        fs.close(fd, function(err2) {
-          if (callback) callback(err || err2)
-        })
-      })
-    })
-  }
-
-  fs.lchmodSync = function (path, mode) {
-    var fd = fs.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode)
-
-    // prefer to return the chmod error, if one occurs,
-    // but still try to close, and report closing errors if they occur.
-    var threw = true
-    var ret
-    try {
-      ret = fs.fchmodSync(fd, mode)
-      threw = false
-    } finally {
-      if (threw) {
-        try {
-          fs.closeSync(fd)
-        } catch (er) {}
-      } else {
-        fs.closeSync(fd)
-      }
-    }
-    return ret
-  }
-}
-
-function patchLutimes (fs) {
-  if (constants.hasOwnProperty("O_SYMLINK")) {
-    fs.lutimes = function (path, at, mt, cb) {
-      fs.open(path, constants.O_SYMLINK, function (er, fd) {
-        if (er) {
-          if (cb) cb(er)
-          return
-        }
-        fs.futimes(fd, at, mt, function (er) {
-          fs.close(fd, function (er2) {
-            if (cb) cb(er || er2)
-          })
-        })
-      })
-    }
-
-    fs.lutimesSync = function (path, at, mt) {
-      var fd = fs.openSync(path, constants.O_SYMLINK)
-      var ret
-      var threw = true
-      try {
-        ret = fs.futimesSync(fd, at, mt)
-        threw = false
-      } finally {
-        if (threw) {
-          try {
-            fs.closeSync(fd)
-          } catch (er) {}
-        } else {
-          fs.closeSync(fd)
-        }
-      }
-      return ret
-    }
-
-  } else {
-    fs.lutimes = function (_a, _b, _c, cb) { if (cb) process.nextTick(cb) }
-    fs.lutimesSync = function () {}
-  }
-}
-
-function chmodFix (orig) {
-  if (!orig) return orig
-  return function (target, mode, cb) {
-    return orig.call(fs, target, mode, function (er) {
-      if (chownErOk(er)) er = null
-      if (cb) cb.apply(this, arguments)
-    })
-  }
-}
-
-function chmodFixSync (orig) {
-  if (!orig) return orig
-  return function (target, mode) {
-    try {
-      return orig.call(fs, target, mode)
-    } catch (er) {
-      if (!chownErOk(er)) throw er
-    }
-  }
-}
-
-
-function chownFix (orig) {
-  if (!orig) return orig
-  return function (target, uid, gid, cb) {
-    return orig.call(fs, target, uid, gid, function (er) {
-      if (chownErOk(er)) er = null
-      if (cb) cb.apply(this, arguments)
-    })
-  }
-}
-
-function chownFixSync (orig) {
-  if (!orig) return orig
-  return function (target, uid, gid) {
-    try {
-      return orig.call(fs, target, uid, gid)
-    } catch (er) {
-      if (!chownErOk(er)) throw er
-    }
-  }
-}
-
-
-function statFix (orig) {
-  if (!orig) return orig
-  // Older versions of Node erroneously returned signed integers for
-  // uid + gid.
-  return function (target, cb) {
-    return orig.call(fs, target, function (er, stats) {
-      if (!stats) return cb.apply(this, arguments)
-      if (stats.uid < 0) stats.uid += 0x100000000
-      if (stats.gid < 0) stats.gid += 0x100000000
-      if (cb) cb.apply(this, arguments)
-    })
-  }
-}
-
-function statFixSync (orig) {
-  if (!orig) return orig
-  // Older versions of Node erroneously returned signed integers for
-  // uid + gid.
-  return function (target) {
-    var stats = orig.call(fs, target)
-    if (stats.uid < 0) stats.uid += 0x100000000
-    if (stats.gid < 0) stats.gid += 0x100000000
-    return stats;
-  }
-}
-
-// ENOSYS means that the fs doesn't support the op. Just ignore
-// that, because it doesn't matter.
-//
-// if there's no getuid, or if getuid() is something other
-// than 0, and the error is EINVAL or EPERM, then just ignore
-// it.
-//
-// This specific case is a silent failure in cp, install, tar,
-// and most other unix tools that manage permissions.
-//
-// When running as root, or if other types of errors are
-// encountered, then it's strict.
-function chownErOk (er) {
-  if (!er)
-    return true
-
-  if (er.code === "ENOSYS")
-    return true
-
-  var nonroot = !process.getuid || process.getuid() !== 0
-  if (nonroot) {
-    if (er.code === "EINVAL" || er.code === "EPERM")
-      return true
-  }
-
-  return false
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/semver/semver.js":
+/***/ "./node_modules/_semver@5.5.0@semver/semver.js":
 /***/ (function(module, exports) {
 
 exports = module.exports = SemVer;
@@ -11470,7 +10958,450 @@ function coerce(version) {
 
 /***/ }),
 
-/***/ "./node_modules/universalify/index.js":
+/***/ "./node_modules/_sort-keys@2.0.0@sort-keys/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+const isPlainObj = __webpack_require__("./node_modules/_is-plain-obj@1.1.0@is-plain-obj/index.js");
+
+module.exports = (obj, opts) => {
+	if (!isPlainObj(obj)) {
+		throw new TypeError('Expected a plain object');
+	}
+
+	opts = opts || {};
+
+	// DEPRECATED
+	if (typeof opts === 'function') {
+		throw new TypeError('Specify the compare function as an option instead');
+	}
+
+	const deep = opts.deep;
+	const seenInput = [];
+	const seenOutput = [];
+
+	const sortKeys = x => {
+		const seenIndex = seenInput.indexOf(x);
+
+		if (seenIndex !== -1) {
+			return seenOutput[seenIndex];
+		}
+
+		const ret = {};
+		const keys = Object.keys(x).sort(opts.compare);
+
+		seenInput.push(x);
+		seenOutput.push(ret);
+
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
+			const val = x[key];
+
+			if (deep && Array.isArray(val)) {
+				const retArr = [];
+
+				for (let j = 0; j < val.length; j++) {
+					retArr[j] = isPlainObj(val[j]) ? sortKeys(val[j]) : val[j];
+				}
+
+				ret[key] = retArr;
+				continue;
+			}
+
+			ret[key] = deep && isPlainObj(val) ? sortKeys(val) : val;
+		}
+
+		return ret;
+	};
+
+	return sortKeys(obj);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/_strict-uri-encode@1.1.0@strict-uri-encode/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = function (str) {
+	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+	});
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/_string_decoder@1.1.1@string_decoder/lib/string_decoder.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+/*<replacement>*/
+
+var Buffer = __webpack_require__("./node_modules/_safe-buffer@5.1.1@safe-buffer/index.js").Buffer;
+/*</replacement>*/
+
+var isEncoding = Buffer.isEncoding || function (encoding) {
+  encoding = '' + encoding;
+  switch (encoding && encoding.toLowerCase()) {
+    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
+      return true;
+    default:
+      return false;
+  }
+};
+
+function _normalizeEncoding(enc) {
+  if (!enc) return 'utf8';
+  var retried;
+  while (true) {
+    switch (enc) {
+      case 'utf8':
+      case 'utf-8':
+        return 'utf8';
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return 'utf16le';
+      case 'latin1':
+      case 'binary':
+        return 'latin1';
+      case 'base64':
+      case 'ascii':
+      case 'hex':
+        return enc;
+      default:
+        if (retried) return; // undefined
+        enc = ('' + enc).toLowerCase();
+        retried = true;
+    }
+  }
+};
+
+// Do not cache `Buffer.isEncoding` when checking encoding names as some
+// modules monkey-patch it to support additional encodings
+function normalizeEncoding(enc) {
+  var nenc = _normalizeEncoding(enc);
+  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
+  return nenc || enc;
+}
+
+// StringDecoder provides an interface for efficiently splitting a series of
+// buffers into a series of JS strings without breaking apart multi-byte
+// characters.
+exports.StringDecoder = StringDecoder;
+function StringDecoder(encoding) {
+  this.encoding = normalizeEncoding(encoding);
+  var nb;
+  switch (this.encoding) {
+    case 'utf16le':
+      this.text = utf16Text;
+      this.end = utf16End;
+      nb = 4;
+      break;
+    case 'utf8':
+      this.fillLast = utf8FillLast;
+      nb = 4;
+      break;
+    case 'base64':
+      this.text = base64Text;
+      this.end = base64End;
+      nb = 3;
+      break;
+    default:
+      this.write = simpleWrite;
+      this.end = simpleEnd;
+      return;
+  }
+  this.lastNeed = 0;
+  this.lastTotal = 0;
+  this.lastChar = Buffer.allocUnsafe(nb);
+}
+
+StringDecoder.prototype.write = function (buf) {
+  if (buf.length === 0) return '';
+  var r;
+  var i;
+  if (this.lastNeed) {
+    r = this.fillLast(buf);
+    if (r === undefined) return '';
+    i = this.lastNeed;
+    this.lastNeed = 0;
+  } else {
+    i = 0;
+  }
+  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
+  return r || '';
+};
+
+StringDecoder.prototype.end = utf8End;
+
+// Returns only complete characters in a Buffer
+StringDecoder.prototype.text = utf8Text;
+
+// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
+StringDecoder.prototype.fillLast = function (buf) {
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
+  this.lastNeed -= buf.length;
+};
+
+// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
+// continuation byte. If an invalid byte is detected, -2 is returned.
+function utf8CheckByte(byte) {
+  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
+  return byte >> 6 === 0x02 ? -1 : -2;
+}
+
+// Checks at most 3 bytes at the end of a Buffer in order to detect an
+// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
+// needed to complete the UTF-8 character (if applicable) are returned.
+function utf8CheckIncomplete(self, buf, i) {
+  var j = buf.length - 1;
+  if (j < i) return 0;
+  var nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 1;
+    return nb;
+  }
+  if (--j < i || nb === -2) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 2;
+    return nb;
+  }
+  if (--j < i || nb === -2) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) {
+      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
+    }
+    return nb;
+  }
+  return 0;
+}
+
+// Validates as many continuation bytes for a multi-byte UTF-8 character as
+// needed or are available. If we see a non-continuation byte where we expect
+// one, we "replace" the validated continuation bytes we've seen so far with
+// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
+// behavior. The continuation byte check is included three times in the case
+// where all of the continuation bytes for a character exist in the same buffer.
+// It is also done this way as a slight performance increase instead of using a
+// loop.
+function utf8CheckExtraBytes(self, buf, p) {
+  if ((buf[0] & 0xC0) !== 0x80) {
+    self.lastNeed = 0;
+    return '\ufffd';
+  }
+  if (self.lastNeed > 1 && buf.length > 1) {
+    if ((buf[1] & 0xC0) !== 0x80) {
+      self.lastNeed = 1;
+      return '\ufffd';
+    }
+    if (self.lastNeed > 2 && buf.length > 2) {
+      if ((buf[2] & 0xC0) !== 0x80) {
+        self.lastNeed = 2;
+        return '\ufffd';
+      }
+    }
+  }
+}
+
+// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
+function utf8FillLast(buf) {
+  var p = this.lastTotal - this.lastNeed;
+  var r = utf8CheckExtraBytes(this, buf, p);
+  if (r !== undefined) return r;
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, p, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, p, 0, buf.length);
+  this.lastNeed -= buf.length;
+}
+
+// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
+// partial character, the character's bytes are buffered until the required
+// number of bytes are available.
+function utf8Text(buf, i) {
+  var total = utf8CheckIncomplete(this, buf, i);
+  if (!this.lastNeed) return buf.toString('utf8', i);
+  this.lastTotal = total;
+  var end = buf.length - (total - this.lastNeed);
+  buf.copy(this.lastChar, 0, end);
+  return buf.toString('utf8', i, end);
+}
+
+// For UTF-8, a replacement character is added when ending on a partial
+// character.
+function utf8End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + '\ufffd';
+  return r;
+}
+
+// UTF-16LE typically needs two bytes per character, but even if we have an even
+// number of bytes available, we need to check if we end on a leading/high
+// surrogate. In that case, we need to wait for the next two bytes in order to
+// decode the last character properly.
+function utf16Text(buf, i) {
+  if ((buf.length - i) % 2 === 0) {
+    var r = buf.toString('utf16le', i);
+    if (r) {
+      var c = r.charCodeAt(r.length - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) {
+        this.lastNeed = 2;
+        this.lastTotal = 4;
+        this.lastChar[0] = buf[buf.length - 2];
+        this.lastChar[1] = buf[buf.length - 1];
+        return r.slice(0, -1);
+      }
+    }
+    return r;
+  }
+  this.lastNeed = 1;
+  this.lastTotal = 2;
+  this.lastChar[0] = buf[buf.length - 1];
+  return buf.toString('utf16le', i, buf.length - 1);
+}
+
+// For UTF-16LE we do not explicitly append special replacement characters if we
+// end on a partial character, we simply let v8 handle that.
+function utf16End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) {
+    var end = this.lastTotal - this.lastNeed;
+    return r + this.lastChar.toString('utf16le', 0, end);
+  }
+  return r;
+}
+
+function base64Text(buf, i) {
+  var n = (buf.length - i) % 3;
+  if (n === 0) return buf.toString('base64', i);
+  this.lastNeed = 3 - n;
+  this.lastTotal = 3;
+  if (n === 1) {
+    this.lastChar[0] = buf[buf.length - 1];
+  } else {
+    this.lastChar[0] = buf[buf.length - 2];
+    this.lastChar[1] = buf[buf.length - 1];
+  }
+  return buf.toString('base64', i, buf.length - n);
+}
+
+function base64End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
+  return r;
+}
+
+// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
+function simpleWrite(buf) {
+  return buf.toString(this.encoding);
+}
+
+function simpleEnd(buf) {
+  return buf && buf.length ? this.write(buf) : '';
+}
+
+/***/ }),
+
+/***/ "./node_modules/_timed-out@4.0.1@timed-out/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function (req, time) {
+	if (req.timeoutTimer) {
+		return req;
+	}
+
+	var delays = isNaN(time) ? time : {socket: time, connect: time};
+	var host = req._headers ? (' to ' + req._headers.host) : '';
+
+	if (delays.connect !== undefined) {
+		req.timeoutTimer = setTimeout(function timeoutHandler() {
+			req.abort();
+			var e = new Error('Connection timed out on request' + host);
+			e.code = 'ETIMEDOUT';
+			req.emit('error', e);
+		}, delays.connect);
+	}
+
+	// Clear the connection timeout timer once a socket is assigned to the
+	// request and is connected.
+	req.on('socket', function assign(socket) {
+		// Socket may come from Agent pool and may be already connected.
+		if (!(socket.connecting || socket._connecting)) {
+			connect();
+			return;
+		}
+
+		socket.once('connect', connect);
+	});
+
+	function clear() {
+		if (req.timeoutTimer) {
+			clearTimeout(req.timeoutTimer);
+			req.timeoutTimer = null;
+		}
+	}
+
+	function connect() {
+		clear();
+
+		if (delays.socket !== undefined) {
+			// Abort the request if there is no activity on the socket for more
+			// than `delays.socket` milliseconds.
+			req.setTimeout(delays.socket, function socketTimeoutHandler() {
+				req.abort();
+				var e = new Error('Socket timed out on request' + host);
+				e.code = 'ESOCKETTIMEDOUT';
+				req.emit('error', e);
+			});
+		}
+	}
+
+	return req.on('error', clear);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/_universalify@0.1.1@universalify/index.js":
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11499,6 +11430,75 @@ exports.fromPromise = function (fn) {
     else fn.apply(this, arguments).then(r => cb(null, r), cb)
   }, 'name', { value: fn.name })
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/_url-parse-lax@3.0.0@url-parse-lax/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+const url = __webpack_require__("url");
+const prependHttp = __webpack_require__("./node_modules/_prepend-http@2.0.0@prepend-http/index.js");
+
+module.exports = (input, options) => {
+	if (typeof input !== 'string') {
+		throw new TypeError(`Expected \`url\` to be of type \`string\`, got \`${typeof input}\` instead.`);
+	}
+
+	const finalUrl = prependHttp(input, Object.assign({https: true}, options));
+	return url.parse(finalUrl);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/_url-to-options@1.0.1@url-to-options/index.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+
+
+// Copied from https://github.com/nodejs/node/blob/master/lib/internal/url.js
+
+function urlToOptions(url) {
+  var options = {
+    protocol: url.protocol,
+    hostname: url.hostname,
+    hash: url.hash,
+    search: url.search,
+    pathname: url.pathname,
+    path: `${url.pathname}${url.search}`,
+    href: url.href
+  };
+  if (url.port !== '') {
+    options.port = Number(url.port);
+  }
+  if (url.username || url.password) {
+    options.auth = `${url.username}:${url.password}`;
+  }
+  return options;
+}
+
+
+
+module.exports = urlToOptions;
+
+
+/***/ }),
+
+/***/ "./node_modules/_util-deprecate@1.0.2@util-deprecate/node.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+
+/**
+ * For Node.js, simply re-export the core `util.deprecate` function.
+ */
+
+module.exports = __webpack_require__("util").deprecate;
 
 
 /***/ }),
@@ -11850,9 +11850,9 @@ Tasks.tasks = null;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_electron__ = __webpack_require__("electron");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_electron__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron_is__ = __webpack_require__("./node_modules/electron-is/is.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron_is__ = __webpack_require__("./node_modules/_electron-is@2.4.0@electron-is/is.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_electron_is___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_electron_is__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs_extra__ = __webpack_require__("./node_modules/fs-extra/lib/index.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs_extra__ = __webpack_require__("./node_modules/_fs-extra@5.0.0@fs-extra/lib/index.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_fs_extra___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_fs_extra__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_fs__ = __webpack_require__("fs");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_fs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_fs__);

@@ -1,7 +1,7 @@
 import React from "react";
-import Login from "./containers/Login";
+import Routes from "./routes";
 import "./App.less";
 
-const App = () => <Login />;
+const App = () => <Routes />;
 
 export default App;

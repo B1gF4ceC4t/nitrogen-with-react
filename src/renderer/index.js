@@ -1,9 +1,14 @@
-import React from 'react';
-import mirror, { render } from 'mirrorx';
-import App from './App';
+import React from "react";
+import mirror, { render, Router } from "mirrorx";
+import App from "./App";
 
 mirror.defaults({
-    historyMode: 'hash'
+  historyMode: "hash"
 });
 
-render(<App />, document.querySelector('#root'));
+render(
+  <Router basename="/" hashType="hashbang">
+    <App />
+  </Router>,
+  document.querySelector("#root")
+);
