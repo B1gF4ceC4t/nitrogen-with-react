@@ -11727,7 +11727,9 @@ const host_config = {
 };
 
 const api_router_config = {
-  accessToken: '/oauth2/access_token'
+  accessToken: '/oauth2/access_token',
+  getUserInfo: '/2/users/show.json',
+  getHomeTimeLine: '/2/statuses/home_timeline.json'
 };
 
 const HOST_CONCIG = host_config;

@@ -29,7 +29,7 @@ export const getToken = () => {
     if (!token) {
       return null;
     }
-    return token;
+    return JSON.parse(token);
   } catch (error) {
     logger("localStorage-get-token", error);
     return null;

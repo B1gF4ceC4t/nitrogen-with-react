@@ -1,19 +1,24 @@
-.ant-menu{
-  background-color: transparent;
-  border: none;
-  .ant-menu-item{
-    background-color: transparent !important;
-    text-align: center;
-    margin: 20px 0;
-    &-active,&-selected{
+.main-menu{
+  .ant-avatar{
+    margin: 10px 0;
+    cursor: pointer;
+  }
+  .ant-menu{
+    background-color: transparent;
+    border: none;
+    .ant-menu-item{
+      background-color: transparent !important;
+      text-align: center;
+      &-active,&-selected{
+        .anticon{
+          color: #ECDDC6 !important;
+        }
+      }
       .anticon{
-        color: #ECDDC6 !important;
+        font-size: 26px;
+        color: #FEFAEC;
+        margin: 0;
       }
     }
-    .anticon{
-      font-size: 26px;
-      color: #FEFAEC;
-    }
   }
-  
 }

@@ -8,7 +8,8 @@ const ipc = ipcRenderer;
 export default {
   name: "auth",
   initialState: {
-    login: getToken()?true:false
+    login: false,
+    token: {}
   },
   reducers: {
     save (state, data) {

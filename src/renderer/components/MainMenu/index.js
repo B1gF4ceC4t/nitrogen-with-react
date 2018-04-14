@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { withRouter, actions } from "mirrorx";
-import { Menu, Icon } from "antd";
+import { withRouter, actions, connect } from "mirrorx";
+import { Menu, Icon, Avatar, Tooltip } from "antd";
 import "./index.less";
 
 class MainMenu extends Component {
@@ -13,21 +13,31 @@ class MainMenu extends Component {
     }
   };
   render() {
-    let { match: { url }, location } = this.props;
+    let { match: { url }, location, user } = this.props;
     return (
-      <Menu selectedKeys={[location.pathname]} mode="vertical">
-        <Menu.Item key={`${url}/home`}>
-          <Icon type="home" onClick={this.switchRoute(`${url}/home`)} />
-        </Menu.Item>
-        <Menu.Item key={`${url}/message`}>
-          <Icon type="message" onClick={this.switchRoute(`${url}/message`)} />
-        </Menu.Item>
-        <Menu.Item key={`${url}/user`}>
-          <Icon type="user" onClick={this.switchRoute(`${url}/user`)} />
-        </Menu.Item>
-      </Menu>
+      <div className="main-menu">
+        <Tooltip placement="right" title={user.name}>
+          <Avatar
+            size="large"
+            icon="user"
+            src={user.profile_image_url}
+            onClick={this.switchRoute(`${url}/user`)}
+          />
+        </Tooltip>
+        <Menu selectedKeys={[location.pathname]} mode="vertical">
+          <Menu.Item key={`${url}/home`}>
+            <Icon type="home" onClick={this.switchRoute(`${url}/home`)} />
+          </Menu.Item>
+          <Menu.Item key={`${url}/message`}>
+            <Icon type="message" onClick={this.switchRoute(`${url}/message`)} />
+          </Menu.Item>
+          <Menu.Item key={`${url}/user`}>
+            <Icon type="user" onClick={this.switchRoute(`${url}/user`)} />
+          </Menu.Item>
+        </Menu>
+      </div>
     );
   }
 }
 
-export default withRouter(MainMenu);
+export default withRouter(connect(state => ({ user: state.user }))(MainMenu));
