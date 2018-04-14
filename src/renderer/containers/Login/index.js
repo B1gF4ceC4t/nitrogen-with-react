@@ -16,7 +16,7 @@ ipc.on("weibo::accessToken::success", (event, msg) => {
   if (msg) {
     logger("weibo::accessToken::success", msg);
     actions.auth.saveToken(msg);
-    actions.routing.push("/home");
+    actions.routing.push("/main");
   }
 });
 
@@ -31,7 +31,7 @@ class Login extends Component {
     super(props);
   }
   go2Home = () => {
-    actions.routing.push("/home");
+    actions.routing.push("/main");
   };
   go2Auth = () => {
     win.loadURL(

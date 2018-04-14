@@ -1,31 +1,14 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect, withRouter, connect } from "mirrorx";
+import PrivateRoute from "./privateRoute";
 import Login from "../containers/Login";
-import Home from "../containers/Home";
-
-const PrivateRoute = ({ component: Component, login: isLogin, ...rest }) => (
-  <Route
-    {...rest}
-    render={props =>
-      isLogin ? (
-        <Component {...props} />
-      ) : (
-        <Redirect
-          to={{
-            pathname: "/login",
-            state: { from: props.location }
-          }}
-        />
-      )
-    }
-  />
-);
+import Main from "../containers/Main";
 
 const Routes = ({ login }) => (
   <Switch>
-    <PrivateRoute exact path="/" component={Home} login={login} />
+    <PrivateRoute exact path="/" component={Login} login={login} root={true}/>
     <Route path="/login" component={Login} />
-    <PrivateRoute path="/home" component={Home} login={login} />
+    <PrivateRoute path="/main" component={Main} login={login} />
     {/*<Route component={NoMatch}/>*/}
   </Switch>
 );
