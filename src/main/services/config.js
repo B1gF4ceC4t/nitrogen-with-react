@@ -5,7 +5,7 @@ const key_config = {
 }
 
 const host_config = {
-  local: 'http://127.0.0.1:8080/',
+  local: 'http://127.0.0.1:8080/index.html',
   host: 'https://api.weibo.com',
   oauth: 'https://api.weibo.com/oauth2/authorize',
 }

@@ -8,18 +8,41 @@ import mirror, {
   actions
 } from "mirrorx";
 import PrivateRoute from "../../routes/privateRoute";
-import { Layout } from "antd";
+import { Layout, message } from "antd";
 const { Header, Footer, Sider, Content } = Layout;
 import MainMenu from "../../components/MainMenu";
 import Home from "../../containers/Home";
 import Message from "../../containers/Message";
 import User from "../../containers/User";
 import UserModel from "../../models/User";
-import { ipcRenderer as ipc } from "electron";
+import { ipcRenderer as ipc, remote } from "electron";
 import { logger } from "../../utils/logger";
+import { getToken } from "../../utils/token-storage";
+import { HOST_CONCIG } from "../../../main/services/config";
 import "./index.less";
 
+const win = remote.getGlobal("win");
 mirror.model(UserModel);
+
+mirror.hook((action, getState) => {
+  (async () => {
+    const { routing: { location }, auth } = getState();
+    const token = await getToken();
+    if (
+      action.type === "@@router/LOCATION_CHANGE" &&
+      !token &&
+      location.pathname !== "/login" &&
+      location.pathname !== "/"
+    ) {
+      actions.auth.save({
+        login: false,
+        token: {}
+      });
+      message.error("请登录");
+      win.loadURL(HOST_CONCIG.local);
+    }
+  })();
+});
 
 ipc.on("weibo::getUserInfo::success", (event, msg) => {
   if (msg) {
@@ -32,18 +55,23 @@ ipc.on("weibo::getUserInfo::error", (event, msg) => {
   if (msg) {
     logger("weibo::getUserInfo::error", msg);
   }
+  message.error("获取用户信息失败");
 });
 
 class Main extends Component {
-  explainTitle = (name)=>{
-    switch(name){
-      case "/main":return "查看微博";
-      case "/main/home":return "查看微博";
-      case "/main/message":return "消息箱";
-      case "/main/user":return "我的信息";
+  explainTitle = name => {
+    switch (name) {
+      case "/main":
+        return "查看微博";
+      case "/main/home":
+        return "查看微博";
+      case "/main/message":
+        return "消息箱";
+      case "/main/user":
+        return "我的信息";
     }
-  }
-  componentWillMount() {
+  };
+  componentDidMount() {
     actions.user.getUserInfo(this.props.token);
   }
   render() {

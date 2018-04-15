@@ -16,25 +16,31 @@
     left: 50%;
     margin-left: -75px;
   }
-  .login{
+  .loginBtn{
     background-color: transparent;
     color: #F38181;
     border: 2px solid #F38181;
-    &:hover,&:active{
+    &:hover,&:focus,&:active{
       color: #FFF;
       background-color: #D15959;
       border-color: #D15959;
     }
+    &.ant-btn-clicked:after {
+      border-color: #D15959;
+    }
   }
-  .enter{
+  .enterBtn{
     background-color: #C1F7F1;
     color: #fff;
     border: none;
     width: 180px;
     margin-left: -90px;
-    &:hover,&:active{
+    &:hover,&:focus,&:active{
       background-color: #A9EEE6;
       border: none;
+    }
+    &.ant-btn-clicked:after {
+      border-color: #A9EEE6;
     }
   }
 }

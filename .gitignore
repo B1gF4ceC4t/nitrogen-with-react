@@ -2,6 +2,6 @@ node_modules/
 release/
 app/*
 !app/package.json
-npm-debug.log
+npm-debug.log.*
 .idea/
 *.iml

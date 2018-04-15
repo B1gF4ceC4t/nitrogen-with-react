@@ -1,6 +1,8 @@
 import { actions } from "mirrorx";
-import { ipcRenderer as ipc } from "electron";
+import { ipcRenderer as ipc, remote } from "electron";
 import { getToken } from "../utils/token-storage";
+
+const win = remote.getGlobal("win");
 
 export default {
   name: "user",
@@ -28,7 +30,7 @@ export default {
           }
         });
       } else {
-        actions.routing.push("/login");
+        win.loadURL(HOST_CONCIG.local);
       }
     }
   }

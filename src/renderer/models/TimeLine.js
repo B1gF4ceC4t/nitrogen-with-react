@@ -1,9 +1,13 @@
 import { actions } from "mirrorx";
-import { ipcRenderer as ipc } from "electron";
+import { ipcRenderer as ipc, remote } from "electron";
+import { HOST_CONCIG } from "../../main/services/config";
+
+const win = remote.getGlobal("win");
 
 export default {
   name: "timeline",
   initialState: {
+    loading: false,
     home_timeline: {}
   },
   reducers: {
@@ -28,7 +32,7 @@ export default {
           }
         });
       } else {
-        actions.routing.push("/login");
+        win.loadURL(HOST_CONCIG.local);
       }
     }
   }

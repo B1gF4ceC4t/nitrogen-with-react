@@ -39,7 +39,8 @@ export default {
     saveToken (data, getState) {
       saveToken(data);
       actions.auth.save({
-        login: true
+        login: true,
+        token: JSON.parse(data)
       });
     }
   }
