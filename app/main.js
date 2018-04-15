@@ -11727,6 +11727,7 @@ const host_config = {
 };
 
 const api_router_config = {
+  revokeoAuth: '/oauth2/revokeoauth2',
   accessToken: '/oauth2/access_token',
   getUserInfo: '/2/users/show.json',
   getHomeTimeLine: '/2/statuses/home_timeline.json'

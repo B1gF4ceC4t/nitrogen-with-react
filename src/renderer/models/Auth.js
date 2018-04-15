@@ -1,9 +1,7 @@
 import { actions } from "mirrorx";
 import { saveToken, clearToken, getToken } from "../utils/token-storage";
 import { KEY_CONFIG } from "../../main/services/config";
-import { ipcRenderer } from "electron";
-
-const ipc = ipcRenderer;
+import { ipcRenderer as ipc } from "electron";
 
 export default {
   name: "auth",
@@ -12,15 +10,15 @@ export default {
     token: {}
   },
   reducers: {
-    save (state, data) {
+    save(state, data) {
       return {
         ...state,
         ...data
-      }
+      };
     }
   },
   effects: {
-    accessToken (data, getState) {
+    accessToken(data, getState) {
       ipc.send("weibo::api", {
         type: "accessToken",
         method: "POST",
@@ -36,12 +34,28 @@ export default {
         }
       });
     },
-    saveToken (data, getState) {
+    saveToken(data, getState) {
       saveToken(data);
       actions.auth.save({
         login: true,
         token: JSON.parse(data)
       });
+    },
+    revokeoAuth(data, getState) {
+      ipc.send("weibo::api", {
+        type: "revokeoAuth",
+        method: "GET",
+        data: {
+          access_token: data.access_token
+        },
+        options: {
+          json: true
+        }
+      });
+    },
+    clearToken(data, getState) {
+      clearToken();
+      actions.auth.save(data);
     }
   }
 };
