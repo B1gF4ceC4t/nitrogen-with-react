@@ -1,25 +1,32 @@
+import { remote } from "electron";
+import emotions from "../emotions";
+
 const URL_REG = /((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)/g;
 const AT_REG = /@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}/g;
 const TAG_REG = /#[^#]+#/g;
+const EMOTION_REG = /\[.{1,4}\]/g;
 
 export const getUrlKey = key => {
   return decodeURIComponent((new RegExp("[?|&]" + key + "=" + "([^&;]+?)(&|#|;|$)").exec(location.href) || [, ""])[1].replace(/\+/g, "%20")) || null;
 };
 
+export const formatDangerousContent = content => (
+  content.replace(/<\/script/g, '<\\/script').replace(/<!--/g, '<\\!--')
+);
+
 export const formatContent = content => {
-  let format = content.replace(URL_REG, function($0) {
-    return '<a href="$0" >' + $0 + "</a>";
+  let format = content.replace(URL_REG, (s) => (`<a href="#" onClick="${()=>{remote.getGlobal("win").loadURL(s)}}">${s}</a>`));
+
+  format = format.replace(AT_REG, (s) => (`<a href="${s}">${s}</a>`));
+
+  format = format.replace(TAG_REG, (s) => (`<a href="${s}">${s}</a>`));
+
+  format = format.replace(EMOTION_REG, (s) => {
+    let url = emotions.find( emotion => ( emotion.phrase === s ) ).url;
+    return `<img src="${url}" width="18px"/>`
   });
 
-  format = format.replace(AT_REG, function($0) {
-    return '<a href="$0" >' + $0 + "</a>";
-  });
-
-  format = format.replace(TAG_REG, function($0) {
-    return '<a href="$0" >' + $0 + "</a>";
-  });
-
-  return format;
+  return format.replace(/<\/script/g, '<\\/script').replace(/<!--/g, '<\\!--');
 };
 
 export const formatImgThumb = img => {

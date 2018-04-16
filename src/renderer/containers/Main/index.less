@@ -13,15 +13,24 @@
       &-header{
         height: 45px;
         padding: 0;
-        background-color: #FFFCF1;
+        background-color: #FEFAEC;
+        border-bottom: 1px solid #F3EEDE;
         text-align: center;
         line-height: 45px;
-        color: #50495B;
+        color: #636056;
         letter-spacing: 0.2rem;
         font-size: 16px;
+        position: fixed;
+        width: 100%;
+        z-index: 999;
+        span{
+          margin-left: -130px;
+        }
       }
       &-content{
-        background-color: #FCFCFC;
+        background-color: #F8F8F8;
+        margin-top: 45px;
+        overflow-y: auto;
       }
     }
   }

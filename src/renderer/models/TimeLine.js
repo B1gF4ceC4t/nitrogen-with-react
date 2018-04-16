@@ -7,7 +7,7 @@ const win = remote.getGlobal("win");
 export default {
   name: "timeline",
   initialState: {
-    loading: false,
+    home_page: 1,
     home_timeline: {}
   },
   reducers: {
@@ -25,7 +25,9 @@ export default {
           type: "getHomeTimeLine",
           method: "GET",
           data: {
-            access_token: data.access_token
+            access_token: data.access_token,
+            page: data.page,
+            count: data.count
           },
           options: {
             json: true
@@ -33,6 +35,17 @@ export default {
         });
       } else {
         win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveTimeline(data, getState) {
+      let { timeline: { home_timeline: { statuses } } } = getState();
+      if (!statuses) {
+        actions.timeline.save({
+          home_timeline: data
+        });
+      } else {
+        home_timeline.statuses = [...statuses, ...data.statuses];
+        actions.timeline.save({ home_timeline });
       }
     }
   }

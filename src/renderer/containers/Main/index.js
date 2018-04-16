@@ -82,7 +82,7 @@ class Main extends Component {
           <MainMenu />
         </Sider>
         <Layout>
-          <Header>{this.explainTitle(location.pathname)}</Header>
+          <Header><span>{this.explainTitle(location.pathname)}</span></Header>
           <Content>
             <Route exact path={match.url} component={Home} />
             <PrivateRoute
