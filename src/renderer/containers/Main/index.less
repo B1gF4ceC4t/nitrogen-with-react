@@ -13,24 +13,28 @@
       &-header{
         height: 45px;
         padding: 0;
-        background-color: #FEFAEC;
+        background-color: #FFFCF3;
         border-bottom: 1px solid #F3EEDE;
         text-align: center;
         line-height: 45px;
-        color: #F7C61B;
+        color: #625772;
         letter-spacing: 0.2rem;
         font-size: 16px;
-        position: fixed;
+        position: relative;
         width: 100%;
         z-index: 999;
-        opacity: 0.6;
-        span{
-          margin-left: -130px;
+        opacity: 0.9;
+        .anticon{
+          position: absolute;
+          font-size: 18px;
+          right: 10px;
+          top: 50%;
+          margin-top: -9px;
+          color: #625772;
         }
       }
       &-content{
         background-color: #F8F8F8;
-        margin-top: 45px;
         overflow-y: auto;
       }
     }

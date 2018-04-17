@@ -8,7 +8,7 @@ import mirror, {
   actions
 } from "mirrorx";
 import PrivateRoute from "../../routes/privateRoute";
-import { Layout, message } from "antd";
+import { Layout, message, Icon } from "antd";
 const { Header, Footer, Sider, Content } = Layout;
 import MainMenu from "../../components/MainMenu";
 import Home from "../../containers/Home";
@@ -26,7 +26,10 @@ mirror.model(UserModel);
 
 mirror.hook((action, getState) => {
   (async () => {
-    const { routing: { location }, auth } = getState();
+    const {
+      routing: { location },
+      auth
+    } = getState();
     const token = await getToken();
     if (
       action.type === "@@router/LOCATION_CHANGE" &&
@@ -82,7 +85,10 @@ class Main extends Component {
           <MainMenu />
         </Sider>
         <Layout>
-          <Header><span>{this.explainTitle(location.pathname)}</span></Header>
+          <Header>
+            <span>{this.explainTitle(location.pathname)}</span>
+            <Icon type="reload" />
+          </Header>
           <Content>
             <Route exact path={match.url} component={Home} />
             <PrivateRoute

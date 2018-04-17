@@ -39,15 +39,19 @@ export default {
     },
     saveTimeline(data, getState) {
       let {
-        timeline: { home_timeline }
+        timeline: { home_timeline, home_page }
       } = getState();
       if (!home_timeline.statuses) {
         actions.timeline.save({
+          home_page: home_page + 1,
           home_timeline: data
         });
       } else {
         home_timeline.statuses = [...home_timeline.statuses, ...data.statuses];
-        actions.timeline.save({ home_timeline });
+        actions.timeline.save({
+          home_page: home_page + 1,
+          home_timeline
+        });
       }
     }
   }

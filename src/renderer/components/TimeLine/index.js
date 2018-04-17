@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Card, Icon, Row, Col } from "antd";
+import { Card, Icon } from "antd";
 import * as DateUtils from "../../utils/date-utils";
 import * as StringUtils from "../../utils/string-utils";
+import Pics from "../Pics";
 import Retweeted from "../Retweeted";
 import "./index.less";
 
@@ -59,22 +60,7 @@ class TimeLine extends Component {
               __html: StringUtils.formatContent(data.text)
             }}
           />
-          {data.pic_urls ? (
-            <Row className="pics" gutter={16}>
-              {data.pic_urls.map(
-                (item, index, array) =>
-                  array.length > 1 ? (
-                    <Col span={8} key={index} className="pics-col">
-                      <img src={item.thumbnail_pic} />
-                    </Col>
-                  ) : (
-                    <Col span={16} key={index} className="pics-col">
-                      <img src={item.thumbnail_pic} />
-                    </Col>
-                  )
-              )}
-            </Row>
-          ) : null}
+          {data.pic_urls ? <Pics pic_urls={data.pic_urls} /> : null}
           {data.retweeted_status ? (
             <Retweeted data={data.retweeted_status} />
           ) : null}

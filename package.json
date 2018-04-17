@@ -71,6 +71,7 @@
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "babel-register": "^6.26.0",
+    "chinese-conv": "^1.0.1",
     "clean-webpack-plugin": "^0.1.19",
     "co": "^4.6.0",
     "cross-env": "^5.1.4",

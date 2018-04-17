@@ -1,7 +1,7 @@
-import { remote } from "electron";
+import { sify } from "chinese-conv";
 import emotions from "../emotions";
 
-const URL_REG = /((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)/g;
+const URL_REG = /((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~`#|]+)/g;
 const AT_REG = /@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}/g;
 const TAG_REG = /#[^#]+#/g;
 const EMOTION_REG_ONE = /\[.{1,8}\]/g;
@@ -19,15 +19,18 @@ export const formatDangerousContent = content => (
 
 export const formatContent = content => {
   let format = content.replace(/\n/g, '<br />');
-  
-  format = content.replace(URL_REG, (s) => (`<a href="${s}">${s}</a>`));
 
-  format = format.replace(AT_REG, (s) => (`<a href="${s}">${s}</a>`));
+  format = format.replace(URL_REG, (s) => {
+    s = s.replace(/[.]*$/,"");
+    return `<a href="javascript:void(0);" onclick="window.open('${s}')">${s}</a>`;
+  });
 
-  format = format.replace(TAG_REG, (s) => (`<a href="${s}">${s}</a>`));
+  format = format.replace(AT_REG, (s) => (`<a href="javascript:void(0);">${s}</a>`));
+
+  format = format.replace(TAG_REG, (s) => (`<a href="javascript:void(0);">${s}</a>`));
 
   format = format.replace(EMOTION_REG_ONE, (s) => {
-    let emotion = emotions.find( emotion => (emotion.phrase === s) );
+    let emotion = emotions.find( emotion => (emotion.phrase === sify(s)) );
     if(emotion && emotion.url){
       return `<img src="${emotion.url}" width="18px"/>`;
     }
@@ -60,6 +63,12 @@ export const formatContent = content => {
 
   return format.replace(/<\/script/g, '<\\/script').replace(/<!--/g, '<\\!--');
 };
+
+export const formatImgClassname = url => {
+  let format = url.split("/");
+  let classname = format[format.length-1].split(".")[0];
+  return `pic-${classname}`;
+}
 
 export const formatImgThumb = img => {
   let format = img.replace("thumbnail", "thumb180");
