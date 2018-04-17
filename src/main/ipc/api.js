@@ -19,8 +19,8 @@ export default () => {
               ...options
             }
           );
-          log(`----------------response[api:${type}]----------------`);
-          console.log(response.body);
+          // log(`----------------response[api:${type}]----------------`);
+          // console.log(response.body);
           event.sender.send(`weibo::${type}::success`, response.body);
         } catch (error) {
           log(`----------------error[api:${type}]----------------`);

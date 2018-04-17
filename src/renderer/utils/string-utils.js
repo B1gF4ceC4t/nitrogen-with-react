@@ -4,7 +4,10 @@ import emotions from "../emotions";
 const URL_REG = /((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)/g;
 const AT_REG = /@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}/g;
 const TAG_REG = /#[^#]+#/g;
-const EMOTION_REG = /\[.{1,4}\]/g;
+const EMOTION_REG_ONE = /\[.{1,8}\]/g;
+const EMOTION_REG_TWO = /\[.{1,4}\]/g;
+const EMOTION_REG_THREE = /\[.{1,3}\]/g;
+const EMOTION_REG_FOUR = /\[.{1,2}\]/g;
 
 export const getUrlKey = key => {
   return decodeURIComponent((new RegExp("[?|&]" + key + "=" + "([^&;]+?)(&|#|;|$)").exec(location.href) || [, ""])[1].replace(/\+/g, "%20")) || null;
@@ -15,15 +18,44 @@ export const formatDangerousContent = content => (
 );
 
 export const formatContent = content => {
-  let format = content.replace(URL_REG, (s) => (`<a href="#" onClick="${()=>{remote.getGlobal("win").loadURL(s)}}">${s}</a>`));
+  let format = content.replace(/\n/g, '<br />');
+  
+  format = content.replace(URL_REG, (s) => (`<a href="${s}">${s}</a>`));
 
   format = format.replace(AT_REG, (s) => (`<a href="${s}">${s}</a>`));
 
   format = format.replace(TAG_REG, (s) => (`<a href="${s}">${s}</a>`));
 
-  format = format.replace(EMOTION_REG, (s) => {
-    let url = emotions.find( emotion => ( emotion.phrase === s ) ).url;
-    return `<img src="${url}" width="18px"/>`
+  format = format.replace(EMOTION_REG_ONE, (s) => {
+    let emotion = emotions.find( emotion => (emotion.phrase === s) );
+    if(emotion && emotion.url){
+      return `<img src="${emotion.url}" width="18px"/>`;
+    }
+    return s;
+  });
+
+  format = format.replace(EMOTION_REG_TWO, (s) => {
+    let emotion = emotions.find( emotion => (emotion.phrase === s) );
+    if(emotion && emotion.url){
+      return `<img src="${emotion.url}" width="18px"/>`;
+    }
+    return s;
+  });
+
+  format = format.replace(EMOTION_REG_THREE, (s) => {
+    let emotion = emotions.find( emotion => (emotion.phrase === s) );
+    if(emotion && emotion.url){
+      return `<img src="${emotion.url}" width="18px"/>`;
+    }
+    return s;
+  });
+
+  format = format.replace(EMOTION_REG_FOUR, (s) => {
+    let emotion = emotions.find( emotion => (emotion.phrase === s) );
+    if(emotion && emotion.url){
+      return `<img src="${emotion.url}" width="18px"/>`;
+    }
+    return s;
   });
 
   return format.replace(/<\/script/g, '<\\/script').replace(/<!--/g, '<\\!--');

@@ -11659,8 +11659,8 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
           method,
           [method === "GET" ? "query" : "body"]: data
         }, options));
-        Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* log */])(`----------------response[api:${type}]----------------`);
-        console.log(response.body);
+        // log(`----------------response[api:${type}]----------------`);
+        // console.log(response.body);
         event.sender.send(`weibo::${type}::success`, response.body);
       } catch (error) {
         Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* log */])(`----------------error[api:${type}]----------------`);

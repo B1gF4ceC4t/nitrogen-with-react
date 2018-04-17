@@ -38,13 +38,15 @@ export default {
       }
     },
     saveTimeline(data, getState) {
-      let { timeline: { home_timeline: { statuses } } } = getState();
-      if (!statuses) {
+      let {
+        timeline: { home_timeline }
+      } = getState();
+      if (!home_timeline.statuses) {
         actions.timeline.save({
           home_timeline: data
         });
       } else {
-        home_timeline.statuses = [...statuses, ...data.statuses];
+        home_timeline.statuses = [...home_timeline.statuses, ...data.statuses];
         actions.timeline.save({ home_timeline });
       }
     }
