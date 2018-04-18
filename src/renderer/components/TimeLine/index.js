@@ -25,15 +25,21 @@ class TimeLine extends Component {
             </span>,
             <span>
               <Icon type="export" />
-              {data.reposts_count === 0 ? "转发" : data.reposts_count}
+              {data.reposts_count === 0
+                ? "转发"
+                : StringUtils.formatNum(data.reposts_count)}
             </span>,
             <span>
               <Icon type="message" />
-              {data.comments_count === 0 ? "评论" : data.comments_count}
+              {data.comments_count === 0
+                ? "评论"
+                : StringUtils.formatNum(data.comments_count)}
             </span>,
             <span>
               <Icon type="heart-o" />
-              {data.attitudes_count === 0 ? "点赞" : data.attitudes_count}
+              {data.attitudes_count === 0
+                ? "点赞"
+                : StringUtils.formatNum(data.attitudes_count)}
             </span>
           ]}
         >
@@ -60,16 +66,15 @@ class TimeLine extends Component {
               __html: StringUtils.formatContent(data.text)
             }}
           />
-          {data.pic_urls ? <Pics pic_urls={data.pic_urls} /> : null}
+          {data.pic_urls ? (
+            <Pics
+              pic_urls={data.pic_urls}
+              timeStamp={new Date(data.created_at).getTime()}
+            />
+          ) : null}
           {data.retweeted_status ? (
             <Retweeted data={data.retweeted_status} />
           ) : null}
-          {/*<Icon type="like-o" />
-          <Icon type="like" />
-          <Icon type="heart" />
-          <Icon type="heart-o" />
-          <Icon type="star" />
-          <Icon type="star-o" />*/}
         </Card>
       </div>
     );
