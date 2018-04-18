@@ -24,7 +24,7 @@ class Retweeted extends Component {
             __html: StringUtils.formatContent(data.text)
           }}
         />
-        {data.pic_urls ? <Pics pic_urls={data.pic_urls} timeStamp={new Date(data.created_at).getTime()}/> : null}
+        {data.pic_urls ? <Pics pic_urls={data.pic_urls} /> : null}
       </div>
     );
   }

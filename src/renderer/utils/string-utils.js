@@ -75,12 +75,6 @@ export const formatContent = content => {
   return format.replace(/<\/script/g, "<\\/script").replace(/<!--/g, "<\\!--");
 };
 
-export const formatImgClassname = (url, timeStamp) => {
-  let format = url.split("/");
-  let classname = format[format.length - 1].split(".")[0];
-  return `pic-${classname}-${timeStamp}`;
-};
-
 export const formatImgMiddle = img => {
   let format = img.replace("thumbnail", "bmiddle");
   return format;

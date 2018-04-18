@@ -12,13 +12,8 @@ class Pics extends Component {
   constructor(props) {
     super(props);
   }
-  loadImage = (url, timeStamp) => () => {
-    document
-      .querySelector(`.${StringUtils.formatImgClassname(url, timeStamp)}`)
-      .setAttribute("src", StringUtils.formatImgMiddle(url));
-  };
   render() {
-    let { pic_urls, timeStamp } = this.props;
+    let { pic_urls } = this.props;
     return (
       <Row className="pics" gutter={16}>
         {pic_urls.map((item, index, array) => {
@@ -38,12 +33,7 @@ class Pics extends Component {
                 <Col span={16} className="pics-col">
                   <LazyLoad>
                     <img
-                      src={item.thumbnail_pic}
-                      className={StringUtils.formatImgClassname(
-                        item.thumbnail_pic,
-                        timeStamp
-                      )}
-                      onLoad={this.loadImage(item.thumbnail_pic, timeStamp)}
+                      src={StringUtils.formatImgMiddle(item.thumbnail_pic)}
                     />
                   </LazyLoad>
                 </Col>
@@ -64,12 +54,7 @@ class Pics extends Component {
                 <Col span={12} className="pics-col">
                   <LazyLoad>
                     <img
-                      src={item.thumbnail_pic}
-                      className={StringUtils.formatImgClassname(
-                        item.thumbnail_pic,
-                        timeStamp
-                      )}
-                      onLoad={this.loadImage(item.thumbnail_pic, timeStamp)}
+                      src={StringUtils.formatImgMiddle(item.thumbnail_pic)}
                     />
                   </LazyLoad>
                 </Col>
@@ -90,12 +75,7 @@ class Pics extends Component {
                 <Col span={8} className="pics-col">
                   <LazyLoad>
                     <img
-                      src={item.thumbnail_pic}
-                      className={StringUtils.formatImgClassname(
-                        item.thumbnail_pic,
-                        timeStamp
-                      )}
-                      onLoad={this.loadImage(item.thumbnail_pic, timeStamp)}
+                      src={StringUtils.formatImgMiddle(item.thumbnail_pic)}
                     />
                   </LazyLoad>
                 </Col>

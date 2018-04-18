@@ -66,12 +66,7 @@ class TimeLine extends Component {
               __html: StringUtils.formatContent(data.text)
             }}
           />
-          {data.pic_urls ? (
-            <Pics
-              pic_urls={data.pic_urls}
-              timeStamp={new Date(data.created_at).getTime()}
-            />
-          ) : null}
+          {data.pic_urls ? <Pics pic_urls={data.pic_urls} /> : null}
           {data.retweeted_status ? (
             <Retweeted data={data.retweeted_status} />
           ) : null}
