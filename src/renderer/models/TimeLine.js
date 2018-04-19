@@ -8,7 +8,9 @@ export default {
   name: "timeline",
   initialState: {
     home_page: 1,
-    home_timeline: {}
+    home_timeline: {},
+    user_page: 1,
+    user_timeline: {}
   },
   reducers: {
     save(state, data) {
@@ -20,7 +22,7 @@ export default {
   },
   effects: {
     getHomeTimeLine(data, getState) {
-      if (data) {
+      if (data.access_token) {
         ipc.send("weibo::api", {
           type: "getHomeTimeLine",
           method: "GET",
@@ -37,20 +39,51 @@ export default {
         win.loadURL(HOST_CONCIG.local);
       }
     },
-    saveTimeline(data, getState) {
+    saveHomeTimeLine(data, getState) {
       let {
         timeline: { home_timeline, home_page }
       } = getState();
       if (!home_timeline.statuses) {
         actions.timeline.save({
-          home_page: home_page + 1,
           home_timeline: data
         });
       } else {
         home_timeline.statuses = [...home_timeline.statuses, ...data.statuses];
         actions.timeline.save({
-          home_page: home_page + 1,
           home_timeline
+        });
+      }
+    },
+    getUserTimeLine(data, getState) {
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "getUserTimeLine",
+          method: "GET",
+          data: {
+            access_token: data.access_token,
+            uid: data.uid,
+            page: data.page
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveUserTimeLine(data, getState) {
+      let {
+        timeline: { user_timeline, user_page }
+      } = getState();
+      if (!user_timeline.statuses) {
+        actions.timeline.save({
+          user_timeline: data
+        });
+      } else {
+        user_timeline.statuses = [...user_timeline.statuses, ...data.statuses];
+        actions.timeline.save({
+          user_timeline
         });
       }
     }

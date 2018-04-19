@@ -11522,7 +11522,6 @@ const createWindow = () => {
     let win = new __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"]({
         width: 930,
         minWidth: 930,
-        maxWidth: 930,
         height: 630,
         minHeight: 630,
         center: true,
@@ -11730,7 +11729,9 @@ const api_router_config = {
   revokeoAuth: '/oauth2/revokeoauth2',
   accessToken: '/oauth2/access_token',
   getUserInfo: '/2/users/show.json',
-  getHomeTimeLine: '/2/statuses/home_timeline.json'
+  getHomeTimeLine: '/2/statuses/home_timeline.json',
+  getUserTimeLine: '/2/statuses/user_timeline.json',
+  goDetail: '/2/statuses/go'
 };
 
 const HOST_CONCIG = host_config;

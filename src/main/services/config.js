@@ -15,6 +15,8 @@ const api_router_config = {
   accessToken: '/oauth2/access_token',
   getUserInfo: '/2/users/show.json',
   getHomeTimeLine: '/2/statuses/home_timeline.json',
+  getUserTimeLine: '/2/statuses/user_timeline.json',
+  goDetail: '/2/statuses/go'
 }
 
 export const HOST_CONCIG = host_config

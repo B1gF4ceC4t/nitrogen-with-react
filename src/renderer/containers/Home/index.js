@@ -10,7 +10,7 @@ import "./index.less";
 ipc.on("weibo::getHomeTimeLine::success", (event, msg) => {
   if (msg) {
     logger("weibo::getHomeTimeLine::success", msg);
-    actions.timeline.saveTimeline(msg);
+    actions.timeline.saveHomeTimeLine(msg);
   }
 });
 

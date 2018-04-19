@@ -7,7 +7,6 @@ const createWindow = () => {
     let win = new BrowserWindow({
         width: 930,
         minWidth: 930,
-        maxWidth: 930,
         height: 630,
         minHeight: 630,
         center: true,

@@ -1,10 +1,28 @@
 import React, { Component } from "react";
-import { Card, Icon } from "antd";
+import { Card, Icon, message } from "antd";
+import { remote, ipcRenderer as ipc } from "electron";
+import { connect } from "mirrorx";
 import * as DateUtils from "../../utils/date-utils";
 import * as StringUtils from "../../utils/string-utils";
+import { logger } from "../../utils/logger";
 import Pics from "../Pics";
 import Retweeted from "../Retweeted";
 import "./index.less";
+
+const win = remote.getGlobal("win");
+
+ipc.on("weibo::goDetail::success", (event, msg) => {
+  if (msg) {
+    logger("weibo::goDetail::success", msg);
+  }
+});
+
+ipc.on("weibo::goDetail::error", (event, msg) => {
+  if (msg) {
+    logger("weibo::goDetail::error", msg);
+  }
+  message.error("获取微博页失败");
+});
 
 const Emotion = ({ url, width, height }) => (
   <img src={url} width={width} height={height} />
@@ -13,6 +31,16 @@ class TimeLine extends Component {
   constructor(props) {
     super(props);
   }
+  goDetail = id => () => {
+    ipc.send("weibo::api", {
+      type: "goDetail",
+      method: "GET",
+      data: {
+        access_token: this.props.token.access_token,
+        id
+      }
+    });
+  };
   render() {
     let { data } = this.props;
     return (
@@ -42,6 +70,7 @@ class TimeLine extends Component {
                 : StringUtils.formatNum(data.attitudes_count)}
             </span>
           ]}
+          onClick={this.goDetail(data.id)}
         >
           <div>
             <img className="avatar" src={data.user.avatar_large} />
@@ -76,4 +105,4 @@ class TimeLine extends Component {
   }
 }
 
-export default TimeLine;
+export default connect(state => state.auth)(TimeLine);

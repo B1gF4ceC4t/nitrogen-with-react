@@ -17,7 +17,7 @@ export default {
   },
   effects: {
     getUserInfo(data, getState) {
-      if (data) {
+      if (data.access_token) {
         ipc.send("weibo::api", {
           type: "getUserInfo",
           method: "GET",
