@@ -11528,7 +11528,8 @@ const createWindow = () => {
         resizable: true,
         alwaysOnTop: false,
         frame: true,
-        skipTaskbar: false
+        skipTaskbar: false,
+        title: "Nitrogen"
     });
     if (true) {
         win.loadURL('http://localhost:8080/index.html');

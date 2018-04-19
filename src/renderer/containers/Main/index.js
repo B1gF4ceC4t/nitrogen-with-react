@@ -9,11 +9,11 @@ import mirror, {
 } from "mirrorx";
 import PrivateRoute from "../../routes/privateRoute";
 import { Layout, message, Icon } from "antd";
-const { Header, Footer, Sider, Content } = Layout;
 import MainMenu from "../../components/MainMenu";
 import Home from "../../containers/Home";
 import Message from "../../containers/Message";
 import User from "../../containers/User";
+import PicView from "../../components/PicView";
 import UserModel from "../../models/User";
 import { ipcRenderer as ipc, remote } from "electron";
 import { logger } from "../../utils/logger";
@@ -21,6 +21,7 @@ import { getToken } from "../../utils/token-storage";
 import { HOST_CONCIG } from "../../../main/services/config";
 import "./index.less";
 
+const { Header, Footer, Sider, Content } = Layout;
 const win = remote.getGlobal("win");
 mirror.model(UserModel);
 
@@ -109,6 +110,7 @@ class Main extends Component {
             {/*<Route component={NoMatch}/>*/}
           </Content>
         </Layout>
+        <PicView />
       </Layout>
     );
   }

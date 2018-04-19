@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Row, Col, Tooltip } from "antd";
+import { connect, actions } from "mirrorx";
 import LazyLoad from "react-lazy-load";
 import * as StringUtils from "../../utils/string-utils";
 import "./index.less";
@@ -12,6 +13,14 @@ class Pics extends Component {
   constructor(props) {
     super(props);
   }
+  showLarge = ({ data, index }) => event => {
+    event.stopPropagation();
+    actions.view.save({
+      viewUrls: data,
+      showView: true,
+      selectedIndex: index
+    });
+  };
   render() {
     let { pic_urls } = this.props;
     return (
@@ -34,6 +43,7 @@ class Pics extends Component {
                   <LazyLoad>
                     <img
                       src={StringUtils.formatImgMiddle(item.thumbnail_pic)}
+                      onClick={this.showLarge({ data: array, index: index })}
                     />
                   </LazyLoad>
                 </Col>
@@ -55,6 +65,7 @@ class Pics extends Component {
                   <LazyLoad>
                     <img
                       src={StringUtils.formatImgMiddle(item.thumbnail_pic)}
+                      onClick={this.showLarge({ data: array, index: index })}
                     />
                   </LazyLoad>
                 </Col>
@@ -76,6 +87,7 @@ class Pics extends Component {
                   <LazyLoad>
                     <img
                       src={StringUtils.formatImgMiddle(item.thumbnail_pic)}
+                      onClick={this.showLarge({ data: array, index: index })}
                     />
                   </LazyLoad>
                 </Col>
@@ -88,4 +100,4 @@ class Pics extends Component {
   }
 }
 
-export default Pics;
+export default connect(state => state.view)(Pics);
