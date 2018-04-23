@@ -59,6 +59,7 @@ class Login extends Component {
   };
   componentWillMount = () => {
     this.checkToken() ? null : this.getToken();
+    win.setTitle("Nitrogen");
   };
   render() {
     return (

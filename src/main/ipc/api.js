@@ -15,7 +15,7 @@ export default () => {
             HOST_CONCIG["host"] + API_ROUTER_CONFIG[type],
             {
               method,
-              [method==="GET"?"query":"body"]: data,
+              [method === "GET" ? "query" : "body"]: data,
               ...options
             }
           );

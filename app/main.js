@@ -11518,39 +11518,39 @@ module.exports = __webpack_require__("util").deprecate;
 
 
 const createWindow = () => {
-    // Create the browser window.
-    let win = new __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"]({
-        width: 930,
-        minWidth: 930,
-        height: 630,
-        minHeight: 630,
-        center: true,
-        resizable: true,
-        alwaysOnTop: false,
-        frame: true,
-        skipTaskbar: false,
-        title: "Nitrogen"
-    });
-    if (true) {
-        win.loadURL('http://localhost:8080/index.html');
-        __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"].addDevToolsExtension('/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.2.1_0');
-        __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"].addDevToolsExtension('/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.15.2_0');
-        // Open the DevTools.
-        win.webContents.openDevTools();
-    } else {
-        win.loadURL(format({
-            pathname: resolve(process.resourcesPath, 'app/renderer/index.html'),
-            protocol: 'file:',
-            slashes: true
-        }));
-    }
+  // Create the browser window.
+  let win = new __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"]({
+    width: 930,
+    minWidth: 930,
+    height: 630,
+    minHeight: 630,
+    center: true,
+    resizable: true,
+    alwaysOnTop: false,
+    frame: true,
+    skipTaskbar: false,
+    title: "Nitrogen"
+  });
+  if (true) {
+    win.loadURL("http://localhost:8080/index.html");
+    __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"].addDevToolsExtension("/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/3.2.1_0");
+    __WEBPACK_IMPORTED_MODULE_0_electron__["BrowserWindow"].addDevToolsExtension("/Users/liufei/Library/Application Support/Google/Chrome/Default/Extensions/lmhkpmbekcpmknklioeibfkpmmfibljd/2.15.2_0");
+    // Open the DevTools.
+    win.webContents.openDevTools();
+  } else {
+    win.loadURL(format({
+      pathname: resolve(process.resourcesPath, "app/renderer/index.html"),
+      protocol: "file:",
+      slashes: true
+    }));
+  }
 
-    // Emitted when the window is closed.
-    win.on('closed', () => {
-        win = null;
-    });
-    global.win = win;
-    return win;
+  // Emitted when the window is closed.
+  win.on("closed", () => {
+    win = null;
+  });
+  global.win = win;
+  return win;
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (createWindow);

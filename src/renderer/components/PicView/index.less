@@ -6,7 +6,7 @@
   height: 100%;
   display: none;
   padding: 20px;
-  overflow: hidden;
+  overflow-y: auto;
   &.show{
     display: block;
   }
@@ -21,8 +21,12 @@
   }
   &-item{
     img{
-      height: 300px;
       width: auto;
+      margin: 0 auto;
+      height: 100%;
     }
+  }
+  .slick-dots{
+    bottom: -20px;
   }
 }
