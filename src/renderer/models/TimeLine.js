@@ -7,10 +7,13 @@ const win = remote.getGlobal("win");
 export default {
   name: "timeline",
   initialState: {
+    tab: 0,
     home_page: 1,
     home_timeline: {},
     user_page: 1,
-    user_timeline: {}
+    user_timeline: {},
+    bilateral_page: 1,
+    bilateral_timeline: {}
   },
   reducers: {
     save(state, data) {
@@ -84,6 +87,42 @@ export default {
         user_timeline.statuses = [...user_timeline.statuses, ...data.statuses];
         actions.timeline.save({
           user_timeline
+        });
+      }
+    },
+    getBilateralTimeLine(data, getState) {
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "getBilateralTimeLine",
+          method: "GET",
+          data: {
+            access_token: data.access_token,
+            page: data.page,
+            count: data.count
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveBilateralTimeLine(data, getState) {
+      let {
+        timeline: { bilateral_timeline, bilateral_page }
+      } = getState();
+      if (!bilateral_timeline.statuses) {
+        actions.timeline.save({
+          bilateral_timeline: data
+        });
+      } else {
+        bilateral_timeline.statuses = [
+          ...bilateral_timeline.statuses,
+          ...data.statuses
+        ];
+        actions.timeline.save({
+          bilateral_timeline
         });
       }
     }

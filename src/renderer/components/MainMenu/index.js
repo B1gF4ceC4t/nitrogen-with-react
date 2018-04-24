@@ -41,7 +41,11 @@ class MainMenu extends Component {
     actions.auth.revokeoAuth(this.props.auth.token);
   };
   render() {
-    let { match: { url }, location, user } = this.props;
+    let {
+      match: { url },
+      location,
+      user
+    } = this.props;
     return (
       <div className="main-menu">
         <Tooltip placement="right" title={user.name}>
@@ -63,6 +67,14 @@ class MainMenu extends Component {
             <Icon type="user" onClick={this.switchRoute(`${url}/user`)} />
           </Menu.Item>
         </Menu>
+        <Tooltip placement="right" title="作者主页，喵～">
+          <Icon
+            type="github"
+            onClick={() => {
+              window.open("https://github.com/B1gF4ceC4t");
+            }}
+          />
+        </Tooltip>
         <Popconfirm
           placement="rightBottom"
           title={`确定退出当前账号？`}

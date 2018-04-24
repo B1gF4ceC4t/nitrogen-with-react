@@ -1,14 +1,8 @@
 import React, { Component } from "react";
-import mirror, {
-  Switch,
-  Route,
-  Redirect,
-  withRouter,
-  connect,
-  actions
-} from "mirrorx";
+import mirror, { Route, connect, actions } from "mirrorx";
 import PrivateRoute from "../../routes/privateRoute";
-import { Layout, message, Icon } from "antd";
+import { Layout, message, Icon, Popover, List } from "antd";
+import classnames from "classnames";
 import MainMenu from "../../components/MainMenu";
 import Home from "../../containers/Home";
 import Message from "../../containers/Message";
@@ -62,6 +56,21 @@ ipc.on("weibo::getUserInfo::error", (event, msg) => {
   message.error("获取用户信息失败");
 });
 
+const SwitchTimeline = ({ tab, handleChange }) => (
+  <List
+    size="small"
+    dataSource={[{ text: "关注", value: 0 }, { text: "好友圈", value: 1 }]}
+    renderItem={item => (
+      <List.Item
+        onClick={handleChange(item.value)}
+        className={classnames("timeline-tab", { active: tab === item.value })}
+      >
+        {item.text}
+      </List.Item>
+    )}
+  />
+);
+
 class Main extends Component {
   explainTitle = name => {
     switch (name) {
@@ -75,11 +84,18 @@ class Main extends Component {
         return "我的信息";
     }
   };
+  changeTab = tab => () => {
+    actions.timeline.save({
+      tab
+    });
+  };
   componentDidMount() {
-    actions.user.getUserInfo(this.props.token);
+    actions.user.getUserInfo(this.props.auth.token);
   }
   render() {
-    let { location, match, login } = this.props;
+    let { location, match } = this.props;
+    let { login } = this.props.auth;
+    let { tab } = this.props.timeline;
     return (
       <Layout className="main">
         <Sider>
@@ -87,8 +103,25 @@ class Main extends Component {
         </Sider>
         <Layout>
           <Header>
+            {/*<span>
+              <Icon type="left" />返回
+            </span>*/}
+            {location.pathname === "/main" ||
+            location.pathname === "/main/home" ? (
+              <Popover
+                placement="bottomLeft"
+                content={
+                  <SwitchTimeline tab={tab} handleChange={this.changeTab} />
+                }
+              >
+                <Icon type="bars" />
+              </Popover>
+            ) : null}
             <span>{this.explainTitle(location.pathname)}</span>
-            <Icon type="reload" />
+            {location.pathname === "/main" ||
+            location.pathname === "/main/home" ? (
+              <Icon type="reload" />
+            ) : null}
           </Header>
           <Content>
             <Route exact path={match.url} component={Home} />
@@ -116,4 +149,7 @@ class Main extends Component {
   }
 }
 
-export default connect(state => state.auth)(Main);
+export default connect(state => ({
+  auth: state.auth,
+  timeline: state.timeline
+}))(Main);

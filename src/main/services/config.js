@@ -16,7 +16,7 @@ const api_router_config = {
   getUserInfo: '/2/users/show.json',
   getHomeTimeLine: '/2/statuses/home_timeline.json',
   getUserTimeLine: '/2/statuses/user_timeline.json',
-  goDetail: '/2/statuses/go'
+  getBilateralTimeLine: '/2/statuses/bilateral_timeline.json',
 }
 
 export const HOST_CONCIG = host_config

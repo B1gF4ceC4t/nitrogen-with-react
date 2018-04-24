@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import mirror, { actions, connect } from "mirrorx";
-import { message, BackTop } from "antd";
+import { message } from "antd";
 import { ipcRenderer as ipc } from "electron";
+import classnames from "classnames";
 import TimeLineModel from "../../models/TimeLine";
 import { logger } from "../../utils/logger";
 import TimeLine from "../../components/TimeLine";
@@ -21,33 +22,65 @@ ipc.on("weibo::getHomeTimeLine::error", (event, msg) => {
   message.error("获取微博失败");
 });
 
+ipc.on("weibo::getBilateralTimeLine::success", (event, msg) => {
+  if (msg) {
+    logger("weibo::getBilateralTimeLine::success", msg);
+    actions.timeline.saveBilateralTimeLine(msg);
+  }
+});
+
+ipc.on("weibo::getBilateralTimeLine::error", (event, msg) => {
+  if (msg) {
+    logger("weibo::getBilateralTimeLine::error", msg);
+  }
+  message.error("获取微博失败");
+});
+
 mirror.model(TimeLineModel);
 
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.home = null;
   }
-  componentDidMount() {
+  componentWillMount() {
     let { auth, timeline } = this.props;
     actions.timeline.getHomeTimeLine({
       ...auth.token,
-      page: timeline.home_page,
+      page: 1,
+      count: 30
+    });
+    actions.timeline.getBilateralTimeLine({
+      ...auth.token,
+      page: 1,
       count: 30
     });
   }
   render() {
     let { timeline } = this.props;
     return (
-      <div>
-        <div className="home" ref={(el) => this.home = el}>
+      <div className="home">
+        <div
+          className={classnames("timeline-tab", {
+            active: timeline.tab === 0
+          })}
+        >
           {timeline.home_timeline.statuses
             ? timeline.home_timeline.statuses.map((item, index) => (
                 <TimeLine key={index} data={item} />
               ))
             : null}
         </div>
-        <BackTop target={()=>this.home} />
+        <div
+          className={classnames("timeline-tab", {
+            active: timeline.tab === 1
+          })}
+        >
+          {timeline.bilateral_timeline.statuses
+            ? timeline.bilateral_timeline.statuses.map((item, index) => (
+                <TimeLine key={index} data={item} />
+              ))
+            : null}
+        </div>
       </div>
     );
   }
