@@ -59,7 +59,7 @@ class MainMenu extends Component {
   getUnreadCount = () => {
     setTimeout(() => {
       actions.remind.getUnreadCount({
-        access_token: this.props.auth.token.access_token,
+        ...this.props.auth.token,
         uid: this.props.user.uid
       });
       this.getUnreadCount();

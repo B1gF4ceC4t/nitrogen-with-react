@@ -1,13 +1,46 @@
 import React, { Component } from "react";
 import { Card, Icon, message } from "antd";
 import { ipcRenderer as ipc } from "electron";
-import { connect, actions } from "mirrorx";
+import mirror, { connect, actions } from "mirrorx";
+import FavoritesModel from "../../models/Favorites";
 import * as DateUtils from "../../utils/date-utils";
 import * as StringUtils from "../../utils/string-utils";
 import { logger } from "../../utils/logger";
 import Pics from "../Pics";
 import Retweeted from "../Retweeted";
 import "./index.less";
+
+mirror.model(FavoritesModel);
+
+ipc.on("weibo::createFavorites::success", (event, msg) => {
+  if (msg) {
+    logger("weibo::createFavorites::success", JSON.parse(msg));
+    actions.timeline.saveFavorites(JSON.parse(msg));
+    message.success("收藏微博成功");
+  }
+});
+
+ipc.on("weibo::createFavorites::error", (event, msg) => {
+  if (msg) {
+    logger("weibo::createFavorites::error", msg);
+  }
+  message.error("收藏微博失败");
+});
+
+ipc.on("weibo::destroyFavorites::success", (event, msg) => {
+  if (msg) {
+    logger("weibo::destroyFavorites::success", JSON.parse(msg));
+    actions.timeline.saveFavorites(JSON.parse(msg));
+    message.success("取消收藏微博成功");
+  }
+});
+
+ipc.on("weibo::destroyFavorites::error", (event, msg) => {
+  if (msg) {
+    logger("weibo::destroyFavorites::error", msg);
+  }
+  message.error("取消收藏微博失败");
+});
 
 const Emotion = ({ url, width, height }) => (
   <img src={url} width={width} height={height} />
@@ -16,6 +49,25 @@ class TimeLine extends Component {
   constructor(props) {
     super(props);
   }
+  handleFavorites = favorited => () => {
+    if (favorited) {
+      this.destroyFavorites();
+    } else {
+      this.createFavorites();
+    }
+  };
+  createFavorites = () => {
+    actions.favorites.createFavorites({
+      ...this.props.token,
+      id: this.props.data.id
+    });
+  };
+  destroyFavorites = () => {
+    actions.favorites.destroyFavorites({
+      ...this.props.token,
+      id: this.props.data.id
+    });
+  };
   render() {
     let { data } = this.props;
     return (
@@ -23,7 +75,7 @@ class TimeLine extends Component {
         <Card
           hoverable
           actions={[
-            <span>
+            <span onClick={this.handleFavorites(data.favorited)}>
               {data.favorited ? <Icon type="star" /> : <Icon type="star-o" />}收藏
             </span>,
             <span>

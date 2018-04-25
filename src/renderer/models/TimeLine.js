@@ -125,6 +125,38 @@ export default {
           bilateral_timeline
         });
       }
+    },
+    saveFavorites(data, getState) {
+      let {
+        timeline: { home_timeline, user_timeline, bilateral_timeline }
+      } = getState();
+      let { status } = data;
+      if (home_timeline.statuses) {
+        home_timeline.statuses.forEach((item, index, array) => {
+          if (item.id === status.id) {
+            array[index] = status;
+          }
+        });
+      }
+      if (user_timeline.statuses) {
+        user_timeline.statuses.forEach((item, index, array) => {
+          if (item.id === status.id) {
+            array[index] = status;
+          }
+        });
+      }
+      if (bilateral_timeline.statuses) {
+        bilateral_timeline.statuses.forEach((item, index, array) => {
+          if (item.id === status.id) {
+            array[index] = status;
+          }
+        });
+      }
+      actions.timeline.save({
+        home_timeline,
+        user_timeline,
+        bilateral_timeline
+      });
     }
   }
 };

@@ -8,6 +8,8 @@ import { logger } from "../../utils/logger";
 import TimeLine from "../../components/TimeLine";
 import "./index.less";
 
+mirror.model(TimeLineModel);
+
 ipc.on("weibo::getHomeTimeLine::success", (event, msg) => {
   if (msg) {
     logger("weibo::getHomeTimeLine::success", msg);
@@ -35,8 +37,6 @@ ipc.on("weibo::getBilateralTimeLine::error", (event, msg) => {
   }
   message.error("获取微博失败");
 });
-
-mirror.model(TimeLineModel);
 
 class Home extends Component {
   constructor(props) {
