@@ -1,7 +1,9 @@
 import { actions } from "mirrorx";
 import { saveToken, clearToken, getToken } from "../utils/token-storage";
-import { KEY_CONFIG } from "../../main/services/config";
-import { ipcRenderer as ipc } from "electron";
+import { KEY_CONFIG, HOST_CONCIG } from "../../main/services/config";
+import { ipcRenderer as ipc, remote } from "electron";
+
+const win = remote.getGlobal("win");
 
 export default {
   name: "auth",
@@ -42,16 +44,20 @@ export default {
       });
     },
     revokeoAuth(data, getState) {
-      ipc.send("weibo::api", {
-        type: "revokeoAuth",
-        method: "GET",
-        data: {
-          access_token: data.access_token
-        },
-        options: {
-          json: true
-        }
-      });
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "revokeoAuth",
+          method: "GET",
+          data: {
+            access_token: data.access_token
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
     },
     clearToken(data, getState) {
       clearToken();

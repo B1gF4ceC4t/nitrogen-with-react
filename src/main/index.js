@@ -1,8 +1,14 @@
-import { app, BrowserWindow, Menu, shell, ipcMain, globalShortcut } from 'electron';
-import createWindow from './createWindow';
-import configureMenu from './menu';
-import ipc from './ipc';
-import tasks from './tasks';
+import {
+  app,
+  BrowserWindow,
+  Menu,
+  shell,
+  ipcMain,
+  globalShortcut
+} from "electron";
+import createWindow from "./createWindow";
+import configureMenu from "./menu";
+import ipc from "./ipc";
 
 let win;
 
@@ -16,24 +22,24 @@ const onReady = () => {
     Menu.setApplicationMenu(menu);
   }
   // 启动调试工具
-  globalShortcut.register('CmdOrCtrl+Shift+8', () => {
+  globalShortcut.register("CmdOrCtrl+Shift+8", () => {
     win.webContents.toggleDevTools();
   });
   ipc();
-}
+};
 
 //当 Electron 完成初始化时被触发
-app.on('ready', onReady);
+app.on("ready", onReady);
 
-//当所有的窗口都被关闭时触发
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-}
+//当所有的窗口都被关闭时被触发
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 //当激活electron窗体的时候，仅支持MacOS
-app.on('activate', () => {
+app.on("activate", () => {
   if (win === null) {
     createWindow();
   }

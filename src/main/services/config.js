@@ -17,6 +17,16 @@ const api_router_config = {
   getHomeTimeLine: '/2/statuses/home_timeline.json',
   getUserTimeLine: '/2/statuses/user_timeline.json',
   getBilateralTimeLine: '/2/statuses/bilateral_timeline.json',
+  createFavorites: '/2/favorites/create.json',
+  destroyFavorites: '/2/favorites/destroy.json',
+  getFavorites: '/2/favorites.json',
+  getUnreadCount: '/2/remind/unread_count.json',
+  getMentions: '/2/statuses/mentions.json',
+  getFriends: '/2/friendships/friends.json',
+  getFollowers: '/2/friendships/followers.json',
+  createComments: '/2/comments/create.json',
+  destroyComments: '/2/comments/destroy.json',
+  replyComments: '/2/comments/reply.json',
 }
 
 export const HOST_CONCIG = host_config

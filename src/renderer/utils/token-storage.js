@@ -1,37 +1,37 @@
 import { logger } from "./logger";
 
 export const saveToken = token => {
-  const localStorage = window.localStorage;
+  const sessionStorage = window.sessionStorage;
   try {
-    localStorage.setItem("token", JSON.stringify(token));
-    logger("localStorage-save-token", "token save in localStorage succeed");
+    sessionStorage.setItem("token", JSON.stringify(token));
+    logger("sessionStorage-save-token", "token save in sessionStorage succeed");
   } catch (error) {
-    logger("localStorage-save-token", error);
+    logger("sessionStorage-save-token", error);
   }
 };
 
 export const clearToken = () => {
-  const localStorage = window.localStorage;
+  const sessionStorage = window.sessionStorage;
   try {
-    if (localStorage.getItem("token") != null) {
-      localStorage.removeItem("token");
-      logger("localStorage-clear-token", "token clear");
+    if (sessionStorage.getItem("token") != null) {
+      sessionStorage.removeItem("token");
+      logger("sessionStorage-clear-token", "token clear");
     }
   } catch (error) {
-    logger("localStorage-clear-token", error);
+    logger("sessionStorage-clear-token", error);
   }
 };
 
 export const getToken = () => {
-  const localStorage = window.localStorage;
+  const sessionStorage = window.sessionStorage;
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       return null;
     }
     return JSON.parse(token);
   } catch (error) {
-    logger("localStorage-get-token", error);
+    logger("sessionStorage-get-token", error);
     return null;
   }
 };

@@ -87,7 +87,6 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.11",
     "fix-path": "^2.1.0",
-    "fs-extra": "^5.0.0",
     "html-webpack-plugin": "^3.0.6",
     "install": "^0.10.4",
     "less": "^3.0.1",
