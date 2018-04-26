@@ -13,12 +13,16 @@ mirror.model(RemindModel);
 ipc.on("weibo::revokeoAuth::success", (event, msg) => {
   if (msg) {
     logger("weibo::revokeoAuth::success", msg);
-    if (msg.result === "true") {
-      actions.auth.clearToken({
-        login: false,
-        token: {}
-      });
-      win.loadURL(HOST_CONCIG.local);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      if (msg.result === "true") {
+        actions.auth.clearToken({
+          login: false,
+          token: {}
+        });
+        win.loadURL(HOST_CONCIG.local);
+      }
     }
   }
 });
@@ -33,7 +37,11 @@ ipc.on("weibo::revokeoAuth::error", (event, msg) => {
 ipc.on("weibo::getUnreadCount::success", (event, msg) => {
   if (msg) {
     logger("weibo::getUnreadCount::success", msg);
-    actions.remind.saveUnreadCount(msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.remind.saveUnreadCount(msg);
+    }
   }
 });
 

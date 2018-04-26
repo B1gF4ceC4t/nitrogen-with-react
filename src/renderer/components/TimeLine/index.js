@@ -15,8 +15,12 @@ mirror.model(FavoritesModel);
 ipc.on("weibo::createFavorites::success", (event, msg) => {
   if (msg) {
     logger("weibo::createFavorites::success", msg);
-    actions.favorites.updateFavorites(msg);
-    message.success("收藏微博成功");
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.favorites.updateFavorites(msg);
+      message.success("收藏微博成功");
+    }
   }
 });
 
@@ -30,8 +34,12 @@ ipc.on("weibo::createFavorites::error", (event, msg) => {
 ipc.on("weibo::destroyFavorites::success", (event, msg) => {
   if (msg) {
     logger("weibo::destroyFavorites::success", msg);
-    actions.favorites.updateFavorites(msg);
-    message.success("取消收藏微博成功");
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.favorites.updateFavorites(msg);
+      message.success("取消收藏微博成功");
+    }
   }
 });
 
@@ -78,7 +86,9 @@ class TimeLine extends Component {
               <span className="created-date">
                 {DateUtils.format(data.created_at)}
               </span>
-              <span className="cancel-star" onClick={this.destroyFavorites}>取消收藏</span>
+              <span className="cancel-star" onClick={this.destroyFavorites}>
+                取消收藏
+              </span>
             </div>
             <div
               className="text"

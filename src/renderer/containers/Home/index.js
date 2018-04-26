@@ -13,7 +13,11 @@ mirror.model(TimeLineModel);
 ipc.on("weibo::getHomeTimeLine::success", (event, msg) => {
   if (msg) {
     logger("weibo::getHomeTimeLine::success", msg);
-    actions.timeline.saveHomeTimeLine(msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.timeline.saveHomeTimeLine(msg);
+    }
   }
 });
 
@@ -27,7 +31,11 @@ ipc.on("weibo::getHomeTimeLine::error", (event, msg) => {
 ipc.on("weibo::getBilateralTimeLine::success", (event, msg) => {
   if (msg) {
     logger("weibo::getBilateralTimeLine::success", msg);
-    actions.timeline.saveBilateralTimeLine(msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.timeline.saveBilateralTimeLine(msg);
+    }
   }
 });
 

@@ -10,7 +10,11 @@ import "./index.less";
 ipc.on("weibo::getFavorites::success", (event, msg) => {
   if (msg) {
     logger("weibo::getFavorites::success", msg);
-    actions.favorites.saveFavorites(msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.favorites.saveFavorites(msg);
+    }
   }
 });
 

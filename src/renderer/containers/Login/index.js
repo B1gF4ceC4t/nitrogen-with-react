@@ -15,8 +15,12 @@ mirror.model(AuthModel);
 ipc.on("weibo::accessToken::success", (event, msg) => {
   if (msg) {
     logger("weibo::accessToken::success", msg);
-    actions.auth.saveToken(msg);
-    actions.routing.push("/main");
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.auth.saveToken(msg);
+      actions.routing.push("/main");
+    }
   }
 });
 
@@ -55,7 +59,7 @@ class Login extends Component {
     let oauthCode = getUrlKey("code");
     if (oauthCode) {
       actions.auth.accessToken(oauthCode);
-    }    
+    }
   };
   componentWillMount = () => {
     this.checkToken() ? null : this.getToken();

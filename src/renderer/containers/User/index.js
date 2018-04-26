@@ -9,7 +9,11 @@ import "./index.less";
 ipc.on("weibo::getUserTimeLine::success", (event, msg) => {
   if (msg) {
     logger("weibo::getUserTimeline::success", msg);
-    actions.timeline.saveUserTimeLine(msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.timeline.saveUserTimeLine(msg);
+    }
   }
 });
 

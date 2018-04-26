@@ -46,7 +46,11 @@ mirror.hook((action, getState) => {
 ipc.on("weibo::getUserInfo::success", (event, msg) => {
   if (msg) {
     logger("weibo::getUserInfo::success", msg);
-    actions.user.save(msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.user.save(msg);
+    }
   }
 });
 
