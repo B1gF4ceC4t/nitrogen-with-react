@@ -6,6 +6,7 @@ import classnames from "classnames";
 import MainMenu from "../../components/MainMenu";
 import Home from "../../containers/Home";
 import Message from "../../containers/Message";
+import Favorites from "../../containers/Favorites";
 import User from "../../containers/User";
 import PicView from "../../components/PicView";
 import UserModel from "../../models/User";
@@ -133,6 +134,11 @@ class Main extends Component {
             <PrivateRoute
               path={`${match.url}/message`}
               component={Message}
+              login={login}
+            />
+            <PrivateRoute
+              path={`${match.url}/favorites`}
+              component={Favorites}
               login={login}
             />
             <PrivateRoute

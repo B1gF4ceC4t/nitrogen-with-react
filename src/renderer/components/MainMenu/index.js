@@ -102,6 +102,12 @@ class MainMenu extends Component {
               />
             </Badge>
           </Menu.Item>
+          <Menu.Item key={`${url}/favorites`}>
+            <Icon
+              type="star-o"
+              onClick={this.switchRoute(`${url}/favorites`)}
+            />
+          </Menu.Item>
           <Menu.Item key={`${url}/user`}>
             <Icon type="user" onClick={this.switchRoute(`${url}/user`)} />
           </Menu.Item>
