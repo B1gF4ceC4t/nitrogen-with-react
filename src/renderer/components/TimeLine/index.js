@@ -14,8 +14,8 @@ mirror.model(FavoritesModel);
 
 ipc.on("weibo::createFavorites::success", (event, msg) => {
   if (msg) {
-    logger("weibo::createFavorites::success", JSON.parse(msg));
-    actions.timeline.saveFavorites(JSON.parse(msg));
+    logger("weibo::createFavorites::success", msg);
+    actions.timeline.saveFavorites(msg);
     message.success("收藏微博成功");
   }
 });
@@ -29,8 +29,8 @@ ipc.on("weibo::createFavorites::error", (event, msg) => {
 
 ipc.on("weibo::destroyFavorites::success", (event, msg) => {
   if (msg) {
-    logger("weibo::destroyFavorites::success", JSON.parse(msg));
-    actions.timeline.saveFavorites(JSON.parse(msg));
+    logger("weibo::destroyFavorites::success", msg);
+    actions.timeline.saveFavorites(msg);
     message.success("取消收藏微博成功");
   }
 });

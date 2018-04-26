@@ -25,7 +25,8 @@ export default {
             id: data.id
           },
           options: {
-            form: true
+            form: true,
+            json: true
           }
         });
       } else {
@@ -42,7 +43,8 @@ export default {
             id: data.id
           },
           options: {
-            form: true
+            form: true,
+            json: true
           }
         });
       } else {
