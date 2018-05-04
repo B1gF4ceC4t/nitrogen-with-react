@@ -33,7 +33,7 @@ class User extends Component {
     actions.timeline.getUserTimeLine({
       ...auth.token,
       uid: user.id,
-      page: timeline.user_page
+      page: 1
     });
   }
   render() {

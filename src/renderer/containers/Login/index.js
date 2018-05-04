@@ -61,10 +61,10 @@ class Login extends Component {
       actions.auth.accessToken(oauthCode);
     }
   };
-  componentWillMount = () => {
+  componentWillMount() {
     this.checkToken() ? null : this.getToken();
     win.setTitle("Nitrogen");
-  };
+  }
   render() {
     return (
       <div className="login">

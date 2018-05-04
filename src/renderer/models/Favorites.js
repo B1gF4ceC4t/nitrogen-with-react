@@ -4,7 +4,8 @@ import { ipcRenderer as ipc } from "electron";
 export default {
   name: "favorites",
   initialState: {
-    favoritesList: []
+    favoritesList: [],
+    favorites_page: 1
   },
   reducers: {
     save(state, data) {
@@ -71,11 +72,22 @@ export default {
     },
     saveFavorites(data, getState) {
       let {
-        favorites: { favoritesList }
+        favorites: { favoritesList, favorites_page }
       } = getState();
-      actions.favorites.save({
-        favoritesList: data.favorites
-      });
+      if (!favoritesList) {
+        actions.favorites.save({
+          favoritesList: data.favorites,
+          favorites_page:
+            data.favorites.length > 0 ? favorites_page + 1 : favorites_page
+        });
+      } else {
+        favoritesList = [...favoritesList, ...data.favorites];
+        actions.favorites.save({
+          favoritesList,
+          favorites_page:
+            data.favorites.length > 0 ? favorites_page + 1 : favorites_page
+        });
+      }
     },
     updateFavorites(data, getState) {
       let {
@@ -107,7 +119,11 @@ export default {
       if (favoritesList) {
         favoritesList.forEach((item, index, array) => {
           if (item.status.id === status.id) {
-            array[index].status = status;
+            if (array[index].status.deleted === "1") {
+              array.splice(index, 1);
+            } else {
+              array[index].status = status;
+            }
           }
         });
       }

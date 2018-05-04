@@ -48,12 +48,14 @@ export default {
       } = getState();
       if (!home_timeline.statuses) {
         actions.timeline.save({
-          home_timeline: data
+          home_timeline: data,
+          home_page: data.statuses.length > 0 ? home_page + 1 : home_page
         });
       } else {
         home_timeline.statuses = [...home_timeline.statuses, ...data.statuses];
         actions.timeline.save({
-          home_timeline
+          home_timeline,
+          home_page: data.statuses.length > 0 ? home_page + 1 : home_page
         });
       }
     },
@@ -81,12 +83,14 @@ export default {
       } = getState();
       if (!user_timeline.statuses) {
         actions.timeline.save({
-          user_timeline: data
+          user_timeline: data,
+          user_page: data.statuses.length > 0 ? user_page + 1 : user_page
         });
       } else {
         user_timeline.statuses = [...user_timeline.statuses, ...data.statuses];
         actions.timeline.save({
-          user_timeline
+          user_timeline,
+          user_page: data.statuses.length > 0 ? user_page + 1 : user_page
         });
       }
     },
@@ -114,7 +118,9 @@ export default {
       } = getState();
       if (!bilateral_timeline.statuses) {
         actions.timeline.save({
-          bilateral_timeline: data
+          bilateral_timeline: data,
+          bilateral_page:
+            data.statuses.length > 0 ? bilateral_page + 1 : bilateral_page
         });
       } else {
         bilateral_timeline.statuses = [
@@ -122,7 +128,9 @@ export default {
           ...data.statuses
         ];
         actions.timeline.save({
-          bilateral_timeline
+          bilateral_timeline,
+          bilateral_page:
+            data.statuses.length > 0 ? bilateral_page + 1 : bilateral_page
         });
       }
     }

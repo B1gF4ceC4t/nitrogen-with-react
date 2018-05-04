@@ -120,7 +120,7 @@ class MainMenu extends Component {
             <Icon type="user" onClick={this.switchRoute(`${url}/user`)} />
           </Menu.Item>
         </Menu>
-        <Tooltip placement="right" title="作者主页，喵～">
+        <Tooltip placement="right" title="作者主页，喵 ฅ≡ω≡ฅ">
           <Icon
             type="github"
             onClick={() => {

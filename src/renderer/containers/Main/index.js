@@ -85,6 +85,8 @@ class Main extends Component {
         return "查看微博";
       case "/main/message":
         return "消息箱";
+      case "/main/favorites":
+        return "我的收藏";
       case "/main/user":
         return "我的信息";
     }
@@ -94,8 +96,76 @@ class Main extends Component {
       tab
     });
   };
-  componentDidMount() {
+  loadMoreHome = () => {
+    let { auth, timeline } = this.props;
+    if (timeline.tab === 0) {
+      actions.timeline.getHomeTimeLine({
+        ...auth.token,
+        page: timeline.home_page,
+        count: 30
+      });
+    } else {
+      actions.timeline.getBilateralTimeLine({
+        ...auth.token,
+        page: timeline.bilateral_page,
+        count: 30
+      });
+    }
+  };
+  loadMoreFavorites = () => {
+    let { auth, favorites } = this.props;
+    actions.favorites.getFavorites({
+      ...auth.token,
+      page: favorites.favorites_page,
+      count: 30
+    });
+  };
+  loadMoreUser = () => {
+    let { auth, user, timeline } = this.props;
+    actions.timeline.getUserTimeLine({
+      ...auth.token,
+      uid: user.id,
+      page: timeline.user_page
+    });
+  };
+  loadMore = () => {
+    switch (this.props.location.pathname) {
+      case "/main":
+        this.loadMoreHome();
+        break;
+      case "/main/home":
+        this.loadMoreHome();
+        break;
+      case "/main/message":
+        break;
+      case "/main/favorites":
+        this.loadMoreFavorites();
+        break;
+      case "/main/user":
+        this.loadMoreUser();
+        break;
+    }
+  };
+  scrollBar = () => {
+    var a = document.querySelector(".ant-layout-content").clientHeight;
+    var b = document.querySelector(".ant-layout-content").scrollTop;
+    var c = document.querySelector(".ant-layout-content").scrollHeight;
+    if (a + b == c) {
+      this.loadMore();
+    }
+  };
+  componentWillMount() {
     actions.user.getUserInfo(this.props.auth.token);
+  }
+  componentDidMount() {
+    document
+      .querySelector(".ant-layout-content")
+      .addEventListener("scroll", this.scrollBar);
+  }
+  componentWillUnmount() {
+    document
+      .querySelector(".ant-layout-content")
+      .removeEventListener("scroll", this.scrollBar);
   }
   render() {
     let { location, match } = this.props;
@@ -161,5 +231,7 @@ class Main extends Component {
 
 export default connect(state => ({
   auth: state.auth,
-  timeline: state.timeline
+  user: state.user,
+  timeline: state.timeline,
+  favorites: state.favorites
 }))(Main);
