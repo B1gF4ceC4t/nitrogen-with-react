@@ -7,7 +7,19 @@ const win = remote.getGlobal("win");
 
 export default {
   name: "user",
-  initialState: {},
+  initialState: {
+    info: {},
+    friends: {
+      users: [],
+      next_cursor: 0,
+      previous_cursor: 0
+    },
+    followers: {
+      users: [],
+      next_cursor: 0,
+      previous_cursor: 0
+    }
+  },
   reducers: {
     save(state, data) {
       return {
@@ -33,6 +45,64 @@ export default {
       } else {
         win.loadURL(HOST_CONCIG.local);
       }
+    },
+    getFriends(data, getState) {
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "getFriends",
+          method: "GET",
+          data: {
+            access_token: data.access_token,
+            uid: data.uid,
+            cursor: data.cursor
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveFriends(data, getState) {
+      let {
+        user: { friends }
+      } = getState();
+      if (friends.users.length > 0) {
+        data.users = [...friends.users, ...data.users];
+      }
+      actions.user.save({
+        friends: data
+      });
+    },
+    getFollowers(data, getState) {
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "getFollowers",
+          method: "GET",
+          data: {
+            access_token: data.access_token,
+            uid: data.uid,
+            cursor: data.cursor
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveFollowers(data, getState) {
+      let {
+        user: { followers }
+      } = getState();
+      if (followers.users.length > 0) {
+        data.users = [...followers.users, ...data.users];
+      }
+      actions.user.save({
+        followers: data
+      });
     }
   }
 };

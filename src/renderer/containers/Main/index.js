@@ -9,6 +9,7 @@ import Message from "../../containers/Message";
 import Favorites from "../../containers/Favorites";
 import User from "../../containers/User";
 import PicView from "../../components/PicView";
+import UserList from "../../components/UserList";
 import UserModel from "../../models/User";
 import { ipcRenderer as ipc, remote } from "electron";
 import { logger } from "../../utils/logger";
@@ -49,7 +50,9 @@ ipc.on("weibo::getUserInfo::success", (event, msg) => {
     if (msg.error_code) {
       message.error(msg.error);
     } else {
-      actions.user.save(msg);
+      actions.user.save({
+        info: msg
+      });
     }
   }
 });
@@ -89,7 +92,14 @@ class Main extends Component {
         return "我的收藏";
       case "/main/user":
         return "我的信息";
+      case "/main/friends":
+        return "我的关注";
+      case "/main/followers":
+        return "我的粉丝";
     }
+  };
+  goBack = () => {
+    actions.routing.goBack();
   };
   changeTab = tab => () => {
     actions.timeline.save({
@@ -124,7 +134,7 @@ class Main extends Component {
     let { auth, user, timeline } = this.props;
     actions.timeline.getUserTimeLine({
       ...auth.token,
-      uid: user.id,
+      uid: user.info.id,
       page: timeline.user_page
     });
   };
@@ -143,6 +153,10 @@ class Main extends Component {
         break;
       case "/main/user":
         this.loadMoreUser();
+        break;
+      case "/main/friends":
+        break;
+      case "/main/followers":
         break;
     }
   };
@@ -178,9 +192,12 @@ class Main extends Component {
         </Sider>
         <Layout>
           <Header>
-            {/*<span>
-              <Icon type="left" />返回
-            </span>*/}
+            {location.pathname === "/main/friends" ||
+            location.pathname === "/main/followers" ? (
+              <span className="back" onClick={this.goBack}>
+                <Icon type="left" />返回
+              </span>
+            ) : null}
             {location.pathname === "/main" ||
             location.pathname === "/main/home" ? (
               <Popover
@@ -218,6 +235,16 @@ class Main extends Component {
             <PrivateRoute
               path={`${match.url}/user`}
               component={User}
+              login={login}
+            />
+            <PrivateRoute
+              path={`${match.url}/friends`}
+              component={UserList}
+              login={login}
+            />
+            <PrivateRoute
+              path={`${match.url}/followers`}
+              component={UserList}
               login={login}
             />
             {/*<Route component={NoMatch}/>*/}

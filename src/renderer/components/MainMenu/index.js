@@ -68,7 +68,7 @@ class MainMenu extends Component {
     setTimeout(() => {
       actions.remind.getUnreadCount({
         ...this.props.auth.token,
-        uid: this.props.user.uid
+        uid: this.props.user.info.uid
       });
       this.getUnreadCount();
     }, 60000);
@@ -80,16 +80,16 @@ class MainMenu extends Component {
     let {
       match: { url },
       location,
-      user,
+      user:{info},
       remind
     } = this.props;
     return (
       <div className="main-menu">
-        <Tooltip placement="right" title={user.name}>
+        <Tooltip placement="right" title={info.name}>
           <Avatar
             size="large"
             icon="user"
-            src={user.profile_image_url}
+            src={info.profile_image_url}
             onClick={this.switchRoute(`${url}/user`)}
           />
         </Tooltip>
