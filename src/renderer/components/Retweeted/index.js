@@ -17,14 +17,25 @@ class Retweeted extends Component {
     let { data } = this.props;
     return (
       <div className="retweeted">
-        <a id={data.user.id}>{`@${data.user.screen_name}：`}</a>
-        <span
-          className="text"
-          dangerouslySetInnerHTML={{
-            __html: StringUtils.formatContent(data.text)
-          }}
-        />
-        {data.pic_urls ? <Pics pic_urls={data.pic_urls} /> : null}
+        {data.deleted === "1" ? (
+          <div
+            className="text"
+            dangerouslySetInnerHTML={{
+              __html: StringUtils.formatContent(data.text)
+            }}
+          />
+        ) : (
+          <div>
+            <a id={data.user.id}>{`@${data.user.screen_name}：`}</a>
+            <span
+              className="text"
+              dangerouslySetInnerHTML={{
+                __html: StringUtils.formatContent(data.text)
+              }}
+            />
+            {data.pic_urls ? <Pics pic_urls={data.pic_urls} /> : null}
+          </div>
+        )}
       </div>
     );
   }

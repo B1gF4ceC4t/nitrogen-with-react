@@ -65,22 +65,20 @@ class MainMenu extends Component {
     actions.auth.revokeoAuth(this.props.auth.token);
   };
   getUnreadCount = () => {
-    setTimeout(() => {
-      actions.remind.getUnreadCount({
-        ...this.props.auth.token,
-        uid: this.props.user.info.uid
-      });
-      this.getUnreadCount();
-    }, 60000);
+    actions.remind.getUnreadCount({
+      ...this.props.auth.token,
+      uid: this.props.user.info.uid
+    });
+    setTimeout(this.getUnreadCount, 60000);
   };
   componentDidMount() {
-    this.getUnreadCount();
+    setTimeout(this.getUnreadCount,500);
   }
   render() {
     let {
       match: { url },
       location,
-      user:{info},
+      user: { info },
       remind
     } = this.props;
     return (

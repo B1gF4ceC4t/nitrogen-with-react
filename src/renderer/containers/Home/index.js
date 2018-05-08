@@ -57,11 +57,6 @@ class Home extends Component {
       page: 1,
       count: 30
     });
-    actions.timeline.getBilateralTimeLine({
-      ...auth.token,
-      page: 1,
-      count: 30
-    });
   }
   render() {
     let { timeline } = this.props;

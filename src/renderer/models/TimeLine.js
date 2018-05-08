@@ -46,7 +46,7 @@ export default {
       let {
         timeline: { home_timeline, home_page }
       } = getState();
-      if (!home_timeline.statuses) {
+      if (!home_timeline.statuses || home_timeline.statuses.length === 0) {
         actions.timeline.save({
           home_timeline: data,
           home_page: data.statuses.length > 0 ? home_page + 1 : home_page
@@ -81,7 +81,7 @@ export default {
       let {
         timeline: { user_timeline, user_page }
       } = getState();
-      if (!user_timeline.statuses) {
+      if (!user_timeline.statuses || user_timeline.statuses.length === 0) {
         actions.timeline.save({
           user_timeline: data,
           user_page: data.statuses.length > 0 ? user_page + 1 : user_page
@@ -116,7 +116,10 @@ export default {
       let {
         timeline: { bilateral_timeline, bilateral_page }
       } = getState();
-      if (!bilateral_timeline.statuses) {
+      if (
+        !bilateral_timeline.statuses ||
+        bilateral_timeline.statuses.length === 0
+      ) {
         actions.timeline.save({
           bilateral_timeline: data,
           bilateral_page:

@@ -8577,8 +8577,10 @@ const api_router_config = {
   getFavorites: '/2/favorites.json',
   getUnreadCount: '/2/remind/unread_count.json',
   getMentions: '/2/statuses/mentions.json',
+  getMentionsFromComments: '/2/comments/mentions.json',
   getFriends: '/2/friendships/friends.json',
   getFollowers: '/2/friendships/followers.json',
+  receiveComments: '/2/comments/to_me.json',
   createComments: '/2/comments/create.json',
   destroyComments: '/2/comments/destroy.json',
   replyComments: '/2/comments/reply.json'

@@ -11,6 +11,7 @@ import User from "../../containers/User";
 import PicView from "../../components/PicView";
 import UserList from "../../components/UserList";
 import UserModel from "../../models/User";
+import MessagesModel from "../../models/Messages";
 import { ipcRenderer as ipc, remote } from "electron";
 import { logger } from "../../utils/logger";
 import { getToken } from "../../utils/token-storage";
@@ -19,7 +20,9 @@ import "./index.less";
 
 const { Header, Footer, Sider, Content } = Layout;
 const win = remote.getGlobal("win");
+
 mirror.model(UserModel);
+mirror.model(MessagesModel);
 
 mirror.hook((action, getState) => {
   (async () => {
@@ -105,6 +108,48 @@ class Main extends Component {
     actions.timeline.save({
       tab
     });
+    let { auth, timeline } = this.props;
+    if (tab === 1) {
+      actions.timeline.getBilateralTimeLine({
+        ...auth.token,
+        page: 1,
+        count: 30
+      });
+    }
+  };
+  reload = () => {
+    (async () => {
+      let {
+        auth,
+        user,
+        timeline: { tab }
+      } = this.props;
+      if (tab === 0) {
+        actions.timeline.save({
+          home_timeline: {},
+          home_page: 1
+        });
+        await actions.timeline.getHomeTimeLine({
+          ...auth.token,
+          page: 1,
+          count: 30
+        });
+      } else if (tab === 1) {
+        actions.timeline.save({
+          bilateral_timeline: {},
+          bilateral_page: 1
+        });
+        await actions.timeline.getBilateralTimeLine({
+          ...auth.token,
+          page: 1,
+          count: 30
+        });
+      }
+      actions.remind.getUnreadCount({
+        ...auth.token,
+        uid: user.info.uid
+      });
+    })();
   };
   loadMoreHome = () => {
     let { auth, timeline } = this.props;
@@ -130,12 +175,31 @@ class Main extends Component {
       count: 30
     });
   };
+  loadMoreMentions = () => {
+    let {
+      auth,
+      messages: { mentions }
+    } = this.props;
+    actions.messages.getMentions({
+      ...auth.token,
+      page: mentions.page,
+      count: 30
+    });
+  };
   loadMoreUser = () => {
     let { auth, user, timeline } = this.props;
     actions.timeline.getUserTimeLine({
       ...auth.token,
       uid: user.info.id,
       page: timeline.user_page
+    });
+  };
+  loadMoreFriends = () => {
+    let { auth, user } = this.props;
+    actions.user.getFriends({
+      ...auth.token,
+      uid: user.info.id,
+      cursor: user.friends.next_cursor
     });
   };
   loadMore = () => {
@@ -146,7 +210,8 @@ class Main extends Component {
       case "/main/home":
         this.loadMoreHome();
         break;
-      case "/main/message":
+      case "/main/message/mention/statuse":
+        this.loadMoreMentions();
         break;
       case "/main/favorites":
         this.loadMoreFavorites();
@@ -155,6 +220,7 @@ class Main extends Component {
         this.loadMoreUser();
         break;
       case "/main/friends":
+        this.loadMoreFriends();
         break;
       case "/main/followers":
         break;
@@ -192,14 +258,18 @@ class Main extends Component {
         </Sider>
         <Layout>
           <Header>
-            {location.pathname === "/main/friends" ||
-            location.pathname === "/main/followers" ? (
+            {[
+              "/main/friends",
+              "/main/followers",
+              "/main/message/mention/statuse",
+              "/main/message/mention/comment",
+              "/main/message/comment"
+            ].indexOf(location.pathname) > -1 ? (
               <span className="back" onClick={this.goBack}>
                 <Icon type="left" />返回
               </span>
             ) : null}
-            {location.pathname === "/main" ||
-            location.pathname === "/main/home" ? (
+            {["/main", "/main/home"].indexOf(location.pathname) > -1 ? (
               <Popover
                 placement="bottomLeft"
                 content={
@@ -210,9 +280,8 @@ class Main extends Component {
               </Popover>
             ) : null}
             <span>{this.explainTitle(location.pathname)}</span>
-            {location.pathname === "/main" ||
-            location.pathname === "/main/home" ? (
-              <Icon type="reload" />
+            {["/main", "/main/home"].indexOf(location.pathname) > -1 ? (
+              <Icon type="reload" onClick={this.reload} />
             ) : null}
           </Header>
           <Content>
@@ -260,5 +329,6 @@ export default connect(state => ({
   auth: state.auth,
   user: state.user,
   timeline: state.timeline,
-  favorites: state.favorites
+  favorites: state.favorites,
+  messages: state.messages
 }))(Main);

@@ -71,6 +71,8 @@ export default {
       if (friends.users.length > 0) {
         data.users = [...friends.users, ...data.users];
       }
+      data.next_cursor =
+        data.next_cursor === 0 ? data.users.length : data.next_cursor;
       actions.user.save({
         friends: data
       });

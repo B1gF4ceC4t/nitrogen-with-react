@@ -74,7 +74,7 @@ export default {
       let {
         favorites: { favoritesList, favorites_page }
       } = getState();
-      if (!favoritesList) {
+      if (!favoritesList || favoritesList.length === 0) {
         actions.favorites.save({
           favoritesList: data.favorites,
           favorites_page:
