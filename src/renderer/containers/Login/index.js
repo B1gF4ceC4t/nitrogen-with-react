@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import mirror, { actions, connect } from "mirrorx";
 import { Button, Icon, message } from "antd";
-import { getUrlKey } from "../../utils/string-utils";
-import { HOST_CONCIG, KEY_CONFIG } from "../../../main/services/config";
-import { getToken } from "../../utils/token-storage";
-import AuthModel from "../../models/Auth";
+import { getUrlKey } from "utils/string-utils";
+import { HOST_CONCIG, KEY_CONFIG } from "main/services/config";
+import { getToken } from "utils/token-storage";
+import AuthModel from "models/Auth";
 import { ipcRenderer as ipc, remote } from "electron";
-import { logger } from "../../utils/logger";
+import { logger } from "utils/logger";
 import "./index.less";
 
 const win = remote.getGlobal("win");

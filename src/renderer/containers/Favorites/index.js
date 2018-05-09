@@ -3,8 +3,8 @@ import { actions, connect } from "mirrorx";
 import { message } from "antd";
 import { ipcRenderer as ipc } from "electron";
 import classnames from "classnames";
-import { logger } from "../../utils/logger";
-import TimeLine from "../../components/TimeLine";
+import { logger } from "utils/logger";
+import TimeLine from "components/TimeLine";
 import "./index.less";
 
 ipc.on("weibo::getFavorites::success", (event, msg) => {

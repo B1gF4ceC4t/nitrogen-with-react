@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import classnames from "classnames";
-import * as StringUtils from "../../utils/string-utils";
+import * as StringUtils from "utils/string-utils";
 import "./index.less";
 
 class CommentSource extends Component {

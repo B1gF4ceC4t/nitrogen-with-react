@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import { Card, Icon, message } from "antd";
 import { ipcRenderer as ipc } from "electron";
 import mirror, { connect, actions } from "mirrorx";
-import FavoritesModel from "../../models/Favorites";
-import * as DateUtils from "../../utils/date-utils";
-import * as StringUtils from "../../utils/string-utils";
-import { logger } from "../../utils/logger";
-import Pics from "../Pics";
-import Retweeted from "../Retweeted";
+import FavoritesModel from "models/Favorites";
+import * as DateUtils from "utils/date-utils";
+import * as StringUtils from "utils/string-utils";
+import { logger } from "utils/logger";
+import Pics from "components/Pics";
+import Retweeted from "components/Retweeted";
 import "./index.less";
 
 mirror.model(FavoritesModel);

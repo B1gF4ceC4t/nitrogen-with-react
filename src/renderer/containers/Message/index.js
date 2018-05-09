@@ -1,8 +1,8 @@
 import React from "react";
 import { Route, connect } from "mirrorx";
-import PrivateRoute from "../../routes/privateRoute";
-import MessageList from "../../components/MessageList";
-import MessagePage from "../../components/MessagePage";
+import PrivateRoute from "routes/privateRoute";
+import MessageList from "components/MessageList";
+import MessagePage from "components/MessagePage";
 import "./index.less";
 
 const Message = ({ location, match, login }) => (

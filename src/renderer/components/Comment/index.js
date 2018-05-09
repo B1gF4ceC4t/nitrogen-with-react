@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { Card, Icon, message } from "antd";
 import { ipcRenderer as ipc } from "electron";
 import { connect, actions } from "mirrorx";
-import * as DateUtils from "../../utils/date-utils";
-import * as StringUtils from "../../utils/string-utils";
-import { logger } from "../../utils/logger";
-import CommentSource from "../CommentSource";
+import * as DateUtils from "utils/date-utils";
+import * as StringUtils from "utils/string-utils";
+import { logger } from "utils/logger";
+import CommentSource from "components/CommentSource";
 import "./index.less";
 
 const Emotion = ({ url, width, height }) => (

@@ -1,6 +1,6 @@
 import { actions } from "mirrorx";
 import { ipcRenderer as ipc, remote } from "electron";
-import { HOST_CONCIG } from "../../main/services/config";
+import { HOST_CONCIG } from "main/services/config";
 
 const win = remote.getGlobal("win");
 

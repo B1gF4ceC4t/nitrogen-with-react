@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Switch, Route, Redirect, withRouter, connect } from "mirrorx";
 import PrivateRoute from "./privateRoute";
-import Login from "../containers/Login";
-import Main from "../containers/Main";
+import Login from "containers/Login";
+import Main from "containers/Main";
 
 const Routes = ({ login }) => (
   <Switch>

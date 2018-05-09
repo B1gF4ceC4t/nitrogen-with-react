@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import got from "got";
-import { log } from "../util";
-import { HOST_CONCIG, API_ROUTER_CONFIG } from "../services/config";
+import { log } from "main/util";
+import { HOST_CONCIG, API_ROUTER_CONFIG } from "main/services/config";
 
 export default () => {
   ipcMain.on(

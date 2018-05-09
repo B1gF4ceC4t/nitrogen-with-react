@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import mirror, { actions, connect } from "mirrorx";
 import { Icon, Row, Col, message } from "antd";
 import { ipcRenderer as ipc } from "electron";
-import TimeLine from "../../components/TimeLine";
-import { logger } from "../../utils/logger";
+import TimeLine from "components/TimeLine";
+import { logger } from "utils/logger";
 import "./index.less";
 
 ipc.on("weibo::getUserTimeLine::success", (event, msg) => {

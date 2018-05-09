@@ -1,7 +1,7 @@
 import { actions } from "mirrorx";
 import { ipcRenderer as ipc, remote } from "electron";
-import { getToken } from "../utils/token-storage";
-import { HOST_CONCIG } from "../../main/services/config";
+import { getToken } from "utils/token-storage";
+import { HOST_CONCIG } from "main/services/config";
 
 const win = remote.getGlobal("win");
 
@@ -102,6 +102,8 @@ export default {
       if (followers.users.length > 0) {
         data.users = [...followers.users, ...data.users];
       }
+      data.next_cursor =
+        data.next_cursor === 0 ? data.users.length : data.next_cursor;
       actions.user.save({
         followers: data
       });

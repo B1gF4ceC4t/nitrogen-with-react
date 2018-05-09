@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import mirror, { Route, actions, connect } from "mirrorx";
-import PrivateRoute from "../../routes/privateRoute";
+import PrivateRoute from "routes/privateRoute";
 import { message } from "antd";
 import { ipcRenderer as ipc } from "electron";
-import { logger } from "../../utils/logger";
-import TimeLine from "../TimeLine";
-import Comment from "../Comment";
+import { logger } from "utils/logger";
+import TimeLine from "components/TimeLine";
+import Comment from "components/Comment";
 import "./index.less";
 
 ipc.on("weibo::getMentions::success", (event, msg) => {

@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import mirror, { withRouter, actions, connect } from "mirrorx";
 import { Menu, Icon, Avatar, Tooltip, Popconfirm, message, Badge } from "antd";
 import { ipcRenderer as ipc, remote } from "electron";
-import RemindModel from "../../models/Remind";
-import { HOST_CONCIG } from "../../../main/services/config";
-import { logger } from "../../utils/logger";
+import RemindModel from "models/Remind";
+import { HOST_CONCIG } from "main/services/config";
+import { logger } from "utils/logger";
 import "./index.less";
 
 const win = remote.getGlobal("win");

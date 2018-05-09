@@ -89,8 +89,11 @@ export default {
     alias: {
       components: resolve(__dirname, "../src/renderer/components/"),
       containers: resolve(__dirname, "../src/renderer/containers/"),
-      services: resolve(__dirname, "../src/renderer/services/"),
+      emotions: resolve(__dirname, "../src/renderer/emotions/"),
+      routes: resolve(__dirname, "../src/renderer/routes/"),
       models: resolve(__dirname, "../src/renderer/models/"),
+      utils: resolve(__dirname, "../src/renderer/utils/"),
+      main: resolve(__dirname, "../src/main/"),
       static: resolve(__dirname, "../static/")
     }
   },

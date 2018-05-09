@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Row, Col, Tooltip } from "antd";
 import { connect, actions } from "mirrorx";
 import LazyLoad from "react-lazy-load";
-import * as StringUtils from "../../utils/string-utils";
+import * as StringUtils from "utils/string-utils";
 import "./index.less";
 
 const ZoomImage = ({ url }) => (

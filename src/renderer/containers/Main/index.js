@@ -1,21 +1,21 @@
 import React, { Component } from "react";
 import mirror, { Route, connect, actions } from "mirrorx";
-import PrivateRoute from "../../routes/privateRoute";
+import PrivateRoute from "routes/privateRoute";
 import { Layout, message, Icon, Popover, List } from "antd";
 import classnames from "classnames";
-import MainMenu from "../../components/MainMenu";
-import Home from "../../containers/Home";
-import Message from "../../containers/Message";
-import Favorites from "../../containers/Favorites";
-import User from "../../containers/User";
-import PicView from "../../components/PicView";
-import UserList from "../../components/UserList";
-import UserModel from "../../models/User";
-import MessagesModel from "../../models/Messages";
+import MainMenu from "components/MainMenu";
+import Home from "containers/Home";
+import Message from "containers/Message";
+import Favorites from "containers/Favorites";
+import User from "containers/User";
+import PicView from "components/PicView";
+import UserList from "components/UserList";
+import UserModel from "models/User";
+import MessagesModel from "models/Messages";
 import { ipcRenderer as ipc, remote } from "electron";
-import { logger } from "../../utils/logger";
-import { getToken } from "../../utils/token-storage";
-import { HOST_CONCIG } from "../../../main/services/config";
+import { logger } from "utils/logger";
+import { getToken } from "utils/token-storage";
+import { HOST_CONCIG } from "main/services/config";
 import "./index.less";
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -186,6 +186,28 @@ class Main extends Component {
       count: 30
     });
   };
+  loadMoreMentionsFromComments = () => {
+    let {
+      auth,
+      messages: { mentionsFromComments }
+    } = this.props;
+    actions.messages.getMentionsFromComments({
+      ...auth.token,
+      page: mentionsFromComments.page,
+      count: 30
+    });
+  };
+  loadMoreComments = () => {
+    let {
+      auth,
+      messages: { comments }
+    } = this.props;
+    actions.messages.receiveComments({
+      ...auth.token,
+      page: comments.page,
+      count: 30
+    });
+  };
   loadMoreUser = () => {
     let { auth, user, timeline } = this.props;
     actions.timeline.getUserTimeLine({
@@ -202,6 +224,14 @@ class Main extends Component {
       cursor: user.friends.next_cursor
     });
   };
+  loadMoreFollowers = () => {
+    let { auth, user } = this.props;
+    actions.user.getFollowers({
+      ...auth.token,
+      uid: user.info.id,
+      cursor: user.followers.next_cursor
+    });
+  };
   loadMore = () => {
     switch (this.props.location.pathname) {
       case "/main":
@@ -213,6 +243,12 @@ class Main extends Component {
       case "/main/message/mention/statuse":
         this.loadMoreMentions();
         break;
+      case "/main/message/mention/comment":
+        this.loadMoreMentionsFromComments();
+        break;
+      case "/main/message/comment":
+        this.loadMoreComments();
+        break;
       case "/main/favorites":
         this.loadMoreFavorites();
         break;
@@ -223,6 +259,7 @@ class Main extends Component {
         this.loadMoreFriends();
         break;
       case "/main/followers":
+        this.loadMoreFollowers();
         break;
     }
   };

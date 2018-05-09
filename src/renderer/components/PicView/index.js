@@ -3,8 +3,8 @@ import { Carousel, Icon } from "antd";
 import mirror, { actions, connect } from "mirrorx";
 import { remote } from "electron";
 import classnames from "classnames";
-import ViewModel from "../../models/View";
-import * as StringUtils from "../../utils/string-utils";
+import ViewModel from "models/View";
+import * as StringUtils from "utils/string-utils";
 import "./index.less";
 
 mirror.model(ViewModel);

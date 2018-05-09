@@ -1,5 +1,5 @@
 import { sify } from "chinese-conv";
-import emotions from "../emotions";
+import emotions from "emotions";
 
 const URL_REG = /((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~`#|]+)/g;
 const AT_REG = /@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}/g;

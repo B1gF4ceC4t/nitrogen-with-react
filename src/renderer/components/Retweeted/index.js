@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Pics from "../Pics";
-import * as StringUtils from "../../utils/string-utils";
+import Pics from "components/Pics";
+import * as StringUtils from "utils/string-utils";
 import "./index.less";
 
 class Retweeted extends Component {

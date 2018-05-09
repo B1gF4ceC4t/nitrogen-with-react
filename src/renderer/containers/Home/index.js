@@ -3,9 +3,9 @@ import mirror, { actions, connect } from "mirrorx";
 import { message } from "antd";
 import { ipcRenderer as ipc } from "electron";
 import classnames from "classnames";
-import TimeLineModel from "../../models/TimeLine";
-import { logger } from "../../utils/logger";
-import TimeLine from "../../components/TimeLine";
+import TimeLineModel from "models/TimeLine";
+import { logger } from "utils/logger";
+import TimeLine from "components/TimeLine";
 import "./index.less";
 
 mirror.model(TimeLineModel);

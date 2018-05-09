@@ -8477,8 +8477,8 @@ const IPC = () => {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_electron___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_electron__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_got__ = __webpack_require__("./node_modules/_got@8.3.0@got/index.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_got___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_got__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__("./src/main/util.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_config__ = __webpack_require__("./src/main/services/config.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_main_util__ = __webpack_require__("./src/main/util.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_main_services_config__ = __webpack_require__("./src/main/services/config.js");
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -8492,9 +8492,9 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
   __WEBPACK_IMPORTED_MODULE_0_electron__["ipcMain"].on("weibo::api", (event, { type, method = "GET", data, options = {} }) => {
     _asyncToGenerator(function* () {
       try {
-        Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* log */])(`----------------request[api:${type}]----------------`);
+        Object(__WEBPACK_IMPORTED_MODULE_2_main_util__["a" /* log */])(`----------------request[api:${type}]----------------`);
         console.log(data);
-        const response = yield __WEBPACK_IMPORTED_MODULE_1_got___default()(__WEBPACK_IMPORTED_MODULE_3__services_config__["b" /* HOST_CONCIG */]["host"] + __WEBPACK_IMPORTED_MODULE_3__services_config__["a" /* API_ROUTER_CONFIG */][type], _extends({
+        const response = yield __WEBPACK_IMPORTED_MODULE_1_got___default()(__WEBPACK_IMPORTED_MODULE_3_main_services_config__["b" /* HOST_CONCIG */]["host"] + __WEBPACK_IMPORTED_MODULE_3_main_services_config__["a" /* API_ROUTER_CONFIG */][type], _extends({
           method,
           [method === "GET" ? "query" : "body"]: data
         }, options));
@@ -8502,7 +8502,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
         // console.log(response.body);
         event.sender.send(`weibo::${type}::success`, response.body);
       } catch (error) {
-        Object(__WEBPACK_IMPORTED_MODULE_2__util__["a" /* log */])(`----------------error[api:${type}]----------------`);
+        Object(__WEBPACK_IMPORTED_MODULE_2_main_util__["a" /* log */])(`----------------error[api:${type}]----------------`);
         console.log(error);
         event.sender.send(`weibo::${type}::error`, { err: error, arg: data });
       }

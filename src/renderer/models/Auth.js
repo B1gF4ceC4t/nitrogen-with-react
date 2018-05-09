@@ -1,6 +1,6 @@
 import { actions } from "mirrorx";
-import { saveToken, clearToken, getToken } from "../utils/token-storage";
-import { KEY_CONFIG, HOST_CONCIG } from "../../main/services/config";
+import { saveToken, clearToken, getToken } from "utils/token-storage";
+import { KEY_CONFIG, HOST_CONCIG } from "main/services/config";
 import { ipcRenderer as ipc, remote } from "electron";
 
 const win = remote.getGlobal("win");
