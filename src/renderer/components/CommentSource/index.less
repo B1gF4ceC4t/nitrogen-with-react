@@ -1,0 +1,42 @@
+.comment-source{
+  background-color: #f2f2f5;
+  padding: 10px;
+  margin-top: 10px;
+  .comment-reply{
+    margin-bottom: 10px;
+  }
+  .source{
+    height: 100px;
+    width: 100%;
+    flex-direction: row;
+    overflow: hidden;
+    flex: auto;
+    display: inline-flex;
+    padding: 2px;
+    &.white{
+      background-color: #fcfcfc;
+    }
+    &-avatar{
+      height: 100%;
+      flex: 0 0 120px ;
+      max-width: 120px;
+      min-width: 120px;
+      width: 120px;
+      img{
+        height: 100%;
+      }
+    }
+    &-info{ 
+      display: flex;
+      flex-direction: column;
+      flex: auto;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      box-direction: normal;
+      flex-basis: auto;
+      box-orient: vertical;
+      box-direction: normal;
+      box-flex: 1;
+    }
+  }
+}

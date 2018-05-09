@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Row, Col } from "antd";
 import Pics from "../Pics";
 import * as StringUtils from "../../utils/string-utils";
 import "./index.less";

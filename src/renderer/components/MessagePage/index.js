@@ -5,6 +5,7 @@ import { message } from "antd";
 import { ipcRenderer as ipc } from "electron";
 import { logger } from "../../utils/logger";
 import TimeLine from "../TimeLine";
+import Comment from "../Comment";
 import "./index.less";
 
 ipc.on("weibo::getMentions::success", (event, msg) => {
@@ -23,6 +24,42 @@ ipc.on("weibo::getMentions::error", (event, msg) => {
     logger("weibo::getMentions::error", msg);
   }
   message.error("获取@我的微博失败");
+});
+
+ipc.on("weibo::getMentionsFromComments::success", (event, msg) => {
+  if (msg) {
+    logger("weibo::getMentionsFromComments::success", msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.messages.saveMentionsFromComments(msg);
+    }
+  }
+});
+
+ipc.on("weibo::getMentionsFromComments::error", (event, msg) => {
+  if (msg) {
+    logger("weibo::getMentionsFromComments::error", msg);
+  }
+  message.error("获取@我的评论失败");
+});
+
+ipc.on("weibo::receiveComments::success", (event, msg) => {
+  if (msg) {
+    logger("weibo::receiveComments::success", msg);
+    if (msg.error_code) {
+      message.error(msg.error);
+    } else {
+      actions.messages.saveComments(msg);
+    }
+  }
+});
+
+ipc.on("weibo::receiveComments::error", (event, msg) => {
+  if (msg) {
+    logger("weibo::receiveComments::error", msg);
+  }
+  message.error("获取评论失败");
 });
 
 class MessagePage extends Component {
@@ -63,17 +100,19 @@ class MessagePage extends Component {
       auth: { login },
       messages
     } = this.props;
-    let statuses = [];
+    let list = [];
     if (state.tag === 0) {
-      statuses = messages.mentions.statuses;
+      list = messages.mentions.statuses;
     } else if (state.tag === 1) {
-      statuses = messages.mentionsFromComments.statuses;
+      list = messages.mentionsFromComments.comments;
     } else if (state.tag === 2) {
-      statuses = messages.comments.statuses;
+      list = messages.comments.comments;
     }
     return (
       <div className="message-page">
-        {statuses.map((item, index) => <TimeLine key={index} data={item} />)}
+        {state.tag === 0
+          ? list.map((item, index) => <TimeLine key={index} data={item} />)
+          : list.map((item, index) => <Comment key={index} data={item} />)}
       </div>
     );
   }

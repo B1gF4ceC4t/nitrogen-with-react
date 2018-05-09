@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { actions } from "mirrorx";
-import { List } from "antd";
+import { List, Icon } from "antd";
 import "./index.less";
 
 const data = [
@@ -36,7 +36,10 @@ class MessageList extends Component {
         className="message-list"
         dataSource={data}
         renderItem={item => (
-          <List.Item onClick={this.switchRoute(item.pathname, item.tag)}>
+          <List.Item
+            onClick={this.switchRoute(item.pathname, item.tag)}
+            actions={[<Icon type="right" />]}
+          >
             {item.text}
           </List.Item>
         )}

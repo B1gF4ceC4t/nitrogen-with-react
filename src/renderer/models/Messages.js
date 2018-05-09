@@ -9,11 +9,11 @@ export default {
       page: 1
     },
     mentionsFromComments: {
-      statuses: [],
+      comments: [],
       page: 1
     },
     comments: {
-      statuses: [],
+      comments: [],
       page: 1
     }
   },
@@ -63,6 +63,88 @@ export default {
           mentions: {
             ...data,
             page: data.statuses.length > 0 ? page + 1 : page
+          }
+        });
+      }
+    },
+    getMentionsFromComments(data, getState) {
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "getMentionsFromComments",
+          method: "GET",
+          data: {
+            access_token: data.access_token,
+            count: data.count,
+            page: data.page
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveMentionsFromComments(data, getState) {
+      let {
+        messages: {
+          mentionsFromComments: { comments, page }
+        }
+      } = getState();
+      if (!comments || comments.length === 0) {
+        actions.messages.save({
+          mentionsFromComments: {
+            ...data,
+            page: data.comments.length > 0 ? page + 1 : page
+          }
+        });
+      } else {
+        data.comments = [...comments, ...data.comments];
+        actions.messages.save({
+          mentionsFromComments: {
+            ...data,
+            page: data.comments.length > 0 ? page + 1 : page
+          }
+        });
+      }
+    },
+    receiveComments(data, getState) {
+      if (data.access_token) {
+        ipc.send("weibo::api", {
+          type: "receiveComments",
+          method: "GET",
+          data: {
+            access_token: data.access_token,
+            count: data.count,
+            page: data.page
+          },
+          options: {
+            json: true
+          }
+        });
+      } else {
+        win.loadURL(HOST_CONCIG.local);
+      }
+    },
+    saveComments(data, getState) {
+      let {
+        messages: {
+          comments: { comments, page }
+        }
+      } = getState();
+      if (!comments || comments.length === 0) {
+        actions.messages.save({
+          comments: {
+            ...data,
+            page: data.comments.length > 0 ? page + 1 : page
+          }
+        });
+      } else {
+        data.comments = [...comments, ...data.comments];
+        actions.messages.save({
+          comments: {
+            ...data,
+            page: data.comments.length > 0 ? page + 1 : page
           }
         });
       }
